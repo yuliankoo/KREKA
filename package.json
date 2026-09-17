@@ -1,0 +1,13 @@
+{
+  "name": "kreka-sk-web",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Web KREKA SK s.r.o. – bezpečnostné systémy, IT a e-kasa pokladnice",
+  "type": "module",
+  "engines": { "node": ">=18" },
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "dev": "node scripts/build.mjs && npx --yes serve dist -l 3000",
+    "preview": "npx --yes serve dist -l 3000"
+  }
+}
