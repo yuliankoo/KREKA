@@ -1,0 +1,545 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Ponuky — Jobsy.sk</title>
+<meta name="description" content="Aktuálne brigády, stáže a part-time ponuky po celom Slovensku. Filtruj podľa mesta a kategórie, prihlás sa na jeden klik.">
+<meta name="theme-color" content="#0A0A14">
+<meta property="og:site_name" content="Jobsy.sk">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://jobsy.sk/ponuky.html">
+<meta property="og:image" content="https://jobsy.sk/og/jobsy-og.jpg?v=3">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://jobsy.sk/og/jobsy-og.jpg?v=3">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A14'/%3E%3Ccircle cx='11' cy='16' r='4' fill='%237C5CFF'/%3E%3Ccircle cx='21' cy='16' r='4' fill='%23FFD84D'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A14;--panel:#10101E;--panel2:#161628;
+  --paper:#EEF0FF;--mute:rgba(238,240,255,.52);
+  --vio:#7C5CFF;--cyan:#3DE8FF;--sun:#FFD84D;--ok:#4ADE80;
+  --rule:rgba(238,240,255,.12);
+  --display:'Unbounded',sans-serif;--body:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:var(--body);font-weight:300;
+  -webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(55% 45% at 85% -5%,rgba(124,92,255,.14),transparent 60%),
+             radial-gradient(45% 40% at 5% 105%,rgba(61,232,255,.08),transparent 60%)}
+::selection{background:var(--sun);color:var(--bg)}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select{font:inherit;color:var(--paper);background:var(--panel2);
+  border:1px solid var(--rule);border-radius:100px;padding:.6rem 1.1rem;outline:none;transition:border-color .25s}
+input:focus,select:focus{border-color:var(--vio)}
+
+.hdr{position:sticky;top:0;z-index:20;display:flex;justify-content:space-between;align-items:center;gap:1rem;
+  padding:clamp(12px,2vw,20px) clamp(18px,4vw,44px);
+  background:rgba(10,10,20,.85);backdrop-filter:blur(10px);border-bottom:1px solid var(--rule)}
+.logo{font-family:var(--display);font-weight:800;font-size:1.1rem;text-decoration:none}
+.logo b{color:var(--sun)}
+.hdr nav{display:flex;gap:1.6rem;font-family:var(--mono);font-size:11px;letter-spacing:.16em;text-transform:uppercase}
+.hdr nav a{color:var(--mute);text-decoration:none;transition:color .3s}
+.hdr nav a:hover,.hdr nav a.on{color:var(--sun)}
+
+.page{position:relative;z-index:1;max-width:1180px;margin:0 auto;padding:clamp(20px,4vw,44px) clamp(18px,4vw,32px) 12vh}
+h1{font-family:var(--display);font-weight:800;font-size:clamp(1.8rem,5vw,3rem);letter-spacing:-.02em}
+.sub{color:var(--mute);margin:.5rem 0 1.8rem}
+.sub b{color:var(--sun);font-weight:500}
+
+.filters{display:flex;flex-wrap:wrap;gap:.55rem;margin-bottom:1.8rem;align-items:center}
+.fchip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;border:1px solid var(--rule);
+  border-radius:100px;padding:.55rem 1.05rem;color:var(--mute);transition:.25s}
+.fchip:hover{color:var(--paper)}
+.fchip.on{background:var(--vio);border-color:var(--vio);color:#fff}
+.filters .sp{flex:1}
+.filters input{min-width:180px}
+
+.list{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:1.1rem}
+.jc{position:relative;text-align:left;border:1px solid var(--rule);border-radius:18px;
+  padding:1.4rem;background:linear-gradient(160deg,rgba(124,92,255,.07),rgba(238,240,255,.02));
+  display:flex;flex-direction:column;gap:.75rem;transition:border-color .35s,transform .35s;
+  will-change:transform}
+.jc:hover{border-color:rgba(255,216,77,.55);transform:translateY(-4px)}
+.jc .row{display:flex;flex-wrap:wrap;gap:.45rem}
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;border:1px solid var(--rule);
+  border-radius:100px;padding:.28rem .68rem;color:var(--mute)}
+.pill.vio{border-color:rgba(124,92,255,.5);color:#B9A5FF}
+.pill.typ{border-color:rgba(61,232,255,.4);color:var(--cyan)}
+.jc h3{font-family:var(--display);font-weight:600;font-size:1.08rem;letter-spacing:-.01em}
+.jc .pay{font-family:var(--mono);font-size:12.5px;color:var(--sun)}
+.jc .co{font-family:var(--mono);font-size:11px;color:var(--mute);
+  border-top:1px solid var(--rule);padding-top:.85rem;display:flex;justify-content:space-between;gap:.6rem}
+.jc .new{position:absolute;top:-9px;right:14px;background:var(--sun);color:var(--bg);
+  font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;border-radius:100px;padding:.22rem .6rem}
+.none{color:var(--mute);padding:3rem 0;text-align:center;grid-column:1/-1}
+
+/* ---------- detail modal ---------- */
+.mb{position:fixed;inset:0;z-index:40;background:rgba(6,6,12,.75);backdrop-filter:blur(5px);
+  display:grid;place-items:center;padding:1rem;opacity:0;pointer-events:none;transition:opacity .35s}
+.mb.show{opacity:1;pointer-events:auto}
+.md{position:relative;width:min(96vw,720px);max-height:90vh;overflow-y:auto;background:var(--panel);
+  border:1px solid var(--rule);border-radius:22px;padding:clamp(1.4rem,3.5vw,2.4rem);
+  transform:translateY(24px) scale(.98);transition:transform .4s cubic-bezier(.22,1,.36,1)}
+.mb.show .md{transform:none}
+.md .x{position:sticky;top:0;float:right;font-family:var(--mono);font-size:12px;letter-spacing:.1em;
+  color:var(--mute);border:1px solid var(--rule);border-radius:100px;padding:.45rem .9rem;
+  background:var(--panel);transition:.25s}
+.md .x:hover{color:var(--bad,#FF6B6B);border-color:currentColor}
+.md h2{font-family:var(--display);font-weight:800;font-size:clamp(1.3rem,3.4vw,1.9rem);
+  letter-spacing:-.02em;margin:.4rem 0 .6rem;padding-right:4rem}
+.md .payline{font-family:var(--mono);font-size:15px;color:var(--sun);margin-bottom:1rem}
+.facts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:.7rem;margin:1.2rem 0}
+.fact{border:1px solid var(--rule);border-radius:14px;padding:.8rem .95rem}
+.fact .k{font-family:var(--mono);font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--mute)}
+.fact .v{margin-top:.3rem;font-size:.93rem}
+.md h4{font-family:var(--display);font-weight:600;font-size:.98rem;margin:1.5rem 0 .55rem}
+.md p,.md li{color:var(--mute);font-size:.95rem;line-height:1.65}
+.md ul{padding-left:1.15rem}
+.md li{margin-bottom:.35rem}
+.md li::marker{color:var(--vio)}
+.cofoot{margin-top:1.6rem;padding-top:1.2rem;border-top:1px solid var(--rule);
+  display:flex;flex-wrap:wrap;gap:.9rem;align-items:center;justify-content:space-between}
+.cofoot .who{font-family:var(--mono);font-size:11px;color:var(--mute);line-height:1.7}
+.cofoot .who b{color:var(--paper);font-weight:500}
+.acts{display:flex;flex-wrap:wrap;gap:.7rem}
+.btn{display:inline-flex;align-items:center;gap:.55rem;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;padding:.85rem 1.5rem;border-radius:100px;
+  transition:.25s;text-decoration:none;white-space:nowrap}
+.btn.p{background:var(--sun);color:var(--bg)}
+.btn.p:hover{background:var(--vio);color:#fff}
+.btn.g{border:1px solid var(--rule);color:var(--paper)}
+.btn.g:hover{border-color:var(--sun);color:var(--sun)}
+.hint{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:.05em;margin-top:.7rem;width:100%}
+
+footer{position:relative;z-index:1;border-top:1px solid var(--rule);margin-top:4rem;
+  padding:1.6rem clamp(18px,4vw,44px);display:flex;flex-wrap:wrap;gap:1.2rem;justify-content:space-between;
+  font-family:var(--mono);font-size:11px;letter-spacing:.12em;color:var(--mute)}
+footer a{color:var(--mute);text-decoration:none}
+footer a:hover{color:var(--sun)}
+
+/* prechod stránky */
+#wipe{position:fixed;inset:0;z-index:80;pointer-events:none;
+  background:linear-gradient(120deg,var(--vio),#12122a 55%,var(--sun));
+  transform-origin:top;transform:scaleY(1);
+  transition:transform .6s cubic-bezier(.83,0,.17,1)}
+#wipe.off{transform:scaleY(0)}
+#wipe.out{transform-origin:bottom;transform:scaleY(1);transition-duration:.5s}
+@media(prefers-reduced-motion:reduce){#wipe{display:none}}
+
+/* karty: vstup zdola + spotlight za kurzorom */
+.jc{position:relative}
+@media(prefers-reduced-motion:no-preference){
+  .jc{opacity:0;transform:translateY(20px)}
+  .jc.in{opacity:1;transform:none;
+    transition:opacity .6s cubic-bezier(.22,1,.36,1),transform .6s cubic-bezier(.22,1,.36,1),border-color .35s}
+  .jc.in:hover{transform:translateY(-4px)}
+}
+.jc::after{content:'';position:absolute;inset:0;border-radius:inherit;pointer-events:none;
+  background:radial-gradient(250px circle at var(--mx,50%) var(--my,50%),rgba(124,92,255,.17),transparent 62%);
+  opacity:0;transition:opacity .35s}
+.jc:hover::after{opacity:1}
+.jc:hover h3{color:var(--sun);transition:color .3s}
+
+/* ambientné bodky na pozadí */
+#dots{position:fixed;inset:0;z-index:0;pointer-events:none}
+
+@media(max-width:1120px) and (min-width:701px){
+  .list{grid-template-columns:repeat(auto-fill,minmax(280px,1fr))}
+}
+@media(max-width:700px){
+  .hdr nav{gap:1rem;font-size:10px}
+  .hm,.hdr nav a.on{display:none}
+  .filters{gap:.45rem}
+  .filters .sp{display:none}
+  #fQ{flex:1 1 100%;min-width:0;width:100%}
+  #fCity,#fType{flex:1;min-width:0}
+  .list{grid-template-columns:1fr}
+  .md{padding:1.3rem;max-height:92vh}
+  .md h2{padding-right:0;margin-top:2.6rem}
+  .md .x{float:none;position:absolute;right:1rem;top:1rem}
+  .mb{padding:.6rem}
+  .acts{width:100%}
+  .acts .btn{flex:1;justify-content:center}
+  .facts{grid-template-columns:1fr 1fr}
+}
+@media(prefers-reduced-motion:reduce){.jc,.mb,.md{transition:none}}
+</style>
+</head>
+<body>
+
+<canvas id="dots" aria-hidden="true"></canvas>
+<div id="wipe" aria-hidden="true"></div>
+
+<div class="hdr">
+  <a class="logo" href="index.html">jobsy<b>.</b>sk</a>
+  <nav>
+    <a href="index.html">Domov</a>
+    <a href="#" class="on">Ponuky</a>
+    <a class="hm" href="index.html#firmy">Pre firmy</a>
+    <a href="app.html" style="color:var(--sun)">Prihlásiť sa</a>
+  </nav>
+</div>
+
+<div class="page">
+  <h1>Ponuky</h1>
+  <div class="sub"><b id="cnt">0</b> aktívnych ponúk. Klikni na ponuku pre detail.</div>
+
+  <div class="filters" id="catRow"></div>
+  <div class="filters">
+    <select id="fCity"></select>
+    <select id="fType">
+      <option value="Všetko">Typ: všetko</option>
+      <option>brigáda</option><option>stáž</option><option>part-time</option>
+    </select>
+    <span class="sp"></span>
+    <input id="fQ" placeholder="Hľadať… (barista, sklad…)" aria-label="Hľadať">
+  </div>
+
+  <div class="list" id="list" aria-live="polite"></div>
+</div>
+
+<div class="mb" id="mb" role="dialog" aria-modal="true">
+  <div class="md" id="md"></div>
+</div>
+
+<footer>
+  <div>Jobsy.sk · Slovensko</div>
+  <div><a href="podmienky.html">Podmienky</a> &nbsp;·&nbsp; <a href="sukromie.html">Ochrana súkromia</a></div>
+  <div>info@jobsy.sk</div>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.SB_URL='https://hcxocjediijwpxfnwfbt.supabase.co';
+window.SB_KEY='sb_publishable_-wRV4wAE8HMljOzp3ZXBSA_Tk9VS3ZB';
+</script>
+<script>
+(function(){
+'use strict';
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+/* poistka: odkry stránku hneď, nezávisle od zvyšku skriptu */
+{const w=document.getElementById('wipe');
+ if(w)requestAnimationFrame(()=>requestAnimationFrame(()=>w.classList.add('off')));}
+const sb=(typeof supabase!=='undefined'&&window.SB_URL)?supabase.createClient(window.SB_URL,window.SB_KEY):null;
+function mapRow(r){
+  const days=Math.max(0,Math.round((Date.now()-new Date(r.created_at).getTime())/86400e3));
+  const L=s=>(s||'').split('\n').map(x=>x.trim()).filter(Boolean);
+  return{id:r.id,title:r.title,company:r.company_name||'—',cat:r.cat,city:r.city,
+    type:r.type||'brigáda',pay:r.pay,when:r.when_txt||'',start:r.start_txt||'',
+    spots:r.spots||1,days,desc:r.descr||'',tasks:L(r.tasks),req:L(r.req),perks:L(r.perks),about:''};
+}
+const CATS=['Gastro','Sklad','Predaj','Eventy','Administratíva','IT'];
+const CITIES=['Bratislava','Nitra','Žilina','B. Bystrica','Prešov','Košice','Remote'];
+
+/* ============ inzeráty ============ */
+const JOBS=[
+{id:11,title:'Barista — víkendy',company:'KaviaMo s.r.o.',cat:'Gastro',city:'Bratislava',type:'brigáda',
+ pay:'6,00 € / h + tringelty',when:'So–Ne 7:30–15:30, min. 2 víkendy v mesiaci',start:'ihneď',spots:2,days:1,
+ desc:'Kaviareň v centre Starého Mesta hľadá baristu na víkendové ranné zmeny. Robíme výberovú kávu, žiadne sirupové šialenstvo — naučíš sa poriadne espresso aj latte art.',
+ tasks:['príprava espressa a mliečnych nápojov','obsluha hostí a pokladne','starostlivosť o mlynček a kávovar','otváranie/zatváranie prevádzky'],
+ req:['18+ (práca s pokladňou)','spoľahlivosť — víkend je víkend','skúsenosť s kávou vítaná, nie nutná'],
+ perks:['tringelty v priemere +1,50 €/h','káva a obed v cene zmeny','barista školenie zdarma'],
+ about:'Rodinná kaviareň, 6 ľudí, otvorené od 2019. Polovica tímu sú študenti.'},
+{id:12,title:'Výpomoc v bistre — obedy',company:'KaviaMo s.r.o.',cat:'Gastro',city:'Bratislava',type:'brigáda',
+ pay:'5,50 € / h + prepitné',when:'Po–Pia 11:00–14:30',start:'od 1. v mesiaci',spots:1,days:4,
+ desc:'Obedový nápor v bistre pri univerzite. Krátka intenzívna zmena — ideálne medzi prednáškami, o pol tretej máš hotovo.',
+ tasks:['výdaj obedov a bagiet','dopĺňanie vitríny','pokladňa','rýchly úprac po obede'],
+ req:['16+','rýchle nohy a úsmev','hygienické minimum vybavíme'],
+ perks:['obed zadarmo','rozvrh podľa tvojich prednášok','výplata vždy k 10. dňu'],
+ about:'Bistro s dennou ponukou, 300 obedov denne, tím 8 ľudí.'},
+{id:13,title:'Skladník — nočná inventúra',company:'LogisPack a.s.',cat:'Sklad',city:'Žilina',type:'brigáda',
+ pay:'8,20 € / h (vrátane príplatkov)',when:'nárazovo 2–3× mesačne, 21:00–5:00',start:'ihneď',spots:6,days:2,
+ desc:'Nočné inventúry v logistickom centre. Hlásiš sa len na termíny, ktoré ti sedia — žiadny záväzok na ďalší mesiac.',
+ tasks:['počítanie a skenovanie položiek','kontrola paliet','zápis do terminálu'],
+ req:['18+ (nočná práca)','presnosť — čísla musia sedieť','vlastná doprava výhodou, odvoz z centra Žiliny máme'],
+ perks:['nočné príplatky už v sadzbe','teplá strava o polnoci','výplata do 5 pracovných dní po inventúre'],
+ about:'Logistika pre e-commerce, sklad 12 000 m², študentov berieme dlhodobo.'},
+{id:14,title:'Balenie e-shop objednávok',company:'LogisPack a.s.',cat:'Sklad',city:'Žilina',type:'part-time',
+ pay:'5,80 € / h',when:'zmeny 4–8 h, hlásiš sa deň vopred v appke',start:'ihneď',spots:10,days:1,
+ desc:'Balíš objednávky pre módny e-shop. Sám si vyberáš, kedy prídeš — systém ti deň vopred ukáže voľné zmeny.',
+ tasks:['vychystávanie tovaru podľa zoznamu','balenie a štítkovanie','jednoduchá kontrola kvality'],
+ req:['16+','poriadkumilovnosť','zvládneš byť na nohách'],
+ perks:['úplne flexibilné zmeny','vykurovaný sklad, hudba povolená','zamestnanecká zľava na e-shop 25 %'],
+ about:'Logistika pre e-commerce, sklad 12 000 m², študentov berieme dlhodobo.'},
+{id:15,title:'Hostes/ka — festivalové leto',company:'EventPro',cat:'Eventy',city:'Košice',type:'brigáda',
+ pay:'9,00 € / h',when:'3 festivalové víkendy (júl–august)',start:'júl',spots:12,days:3,
+ desc:'Vstupy, infopointy a welcome zóna na troch letných festivaloch na východe. Strava, doprava z Košíc a ubytovanie v stane v cene.',
+ tasks:['skenovanie vstupeniek a náramky','infopoint — odpovede návštevníkom','welcome drink zóna'],
+ req:['18+','komunikatívnosť v SK, základná AJ','energia vydržať 10-hodinovú zmenu'],
+ perks:['po zmene voľný vstup na koncerty','doprava + strava + stan v cene','bonus 50 € za všetky 3 víkendy'],
+ about:'Eventová agentúra, 30+ akcií ročne, festivalový tím staviame zo študentov.'},
+{id:16,title:'Promo tím — ochutnávky',company:'EventPro',cat:'Eventy',city:'Košice',type:'brigáda',
+ pay:'7,50 € / h',when:'Pia 14–19, So 10–18, podľa dohody',start:'ihneď',spots:4,days:5,
+ desc:'Ochutnávky nápojov a snackov v obchodných centrách v Košiciach a okolí. Zaškolenie k produktu dostaneš vopred.',
+ tasks:['príprava ochutnávkového stánku','oslovovanie zákazníkov','krátky reporting z akcie'],
+ req:['18+','príjemné vystupovanie','spoľahlivosť — stánok bez teba nestojí'],
+ perks:['víkendová práca = žiadne kolízie so školou','produkty domov','pravidelné akcie každý týždeň'],
+ about:'Eventová agentúra, 30+ akcií ročne, festivalový tím staviame zo študentov.'},
+{id:17,title:'Sociálne siete — stáž',company:'EventPro',cat:'IT',city:'Remote',type:'stáž',
+ pay:'8,00 € / h',when:'10–15 h týždenne, čas si riadiš sám/sama',start:'dohodou',spots:1,days:6,
+ desc:'Staráš sa o Instagram a TikTok agentúry — reels z akcií, príspevky, plánovanie. Materiál dostávaš od nás, kreativita je na tebe. Po stáži reálna šanca na stálu spoluprácu.',
+ tasks:['strih krátkych videí (CapCut a pod.)','copy k príspevkom v slovenčine','plánovanie obsahu na 2 týždne dopredu','mesačný mini-report dosahov'],
+ req:['vlastné portfólio alebo aktívny profil','cit pre trendy','samostatnosť — remote znamená remote'],
+ perks:['plne z domu','portfólio z reálnych kampaní','mentoring od marketing leada'],
+ about:'Eventová agentúra, 30+ akcií ročne, festivalový tím staviame zo študentov.'},
+{id:18,title:'Predavač/ka — kníhkupectvo',company:'Kníhkupectvo Litera',cat:'Predaj',city:'B. Bystrica',type:'part-time',
+ pay:'5,20 € / h',when:'zmeny 12–18 h, 3× týždenne podľa rozvrhu',start:'ihneď',spots:1,days:2,
+ desc:'Poobedné zmeny v kníhkupectve na námestí. Kľud, knihy a zákazníci, ktorí sa chcú rozprávať o čítaní.',
+ tasks:['obsluha a pokladňa','dopĺňanie a objednávky titulov','balenie darčekov'],
+ req:['16+','vzťah ku knihám','ochota poradiť'],
+ perks:['zľava 30 % na knihy','pokojné prostredie na učenie sa v hluchých hodinách','stabilný dlhodobý rozvrh'],
+ about:'Nezávislé kníhkupectvo, 2 predajne, 12 rokov na trhu.'},
+{id:19,title:'Pokladník/čka — potraviny',company:'Fresh Market',cat:'Predaj',city:'Nitra',type:'brigáda',
+ pay:'5,60 € / h + víkendový príplatok',when:'víkendy 8–20 h (krátke zmeny možné)',start:'ihneď',spots:3,days:1,
+ desc:'Víkendové zmeny v potravinách pri kampuse. Krátke aj dlhé zmeny, presne podľa toho, koľko chceš odrobiť.',
+ tasks:['pokladňa','dokladanie tovaru','kontrola dátumov spotreby'],
+ req:['16+','zodpovednosť pri pokladni','ranné vstávanie nevadí (ranná zmena od 7:30)'],
+ perks:['príplatok +20 % v nedeľu','zamestnanecká zľava 10 %','výplata týždenne'],
+ about:'Sieť 4 predajní so zdravými potravinami v Nitre a okolí.'},
+{id:20,title:'Recepcia coworkingud — poobedia',company:'HubSpace',cat:'Administratíva',city:'Bratislava',type:'part-time',
+ pay:'6,20 € / h',when:'Po–Št 14:00–20:00',start:'od 15. v mesiaci',spots:1,days:7,
+ desc:'Poobedná recepcia v coworkingu — privítať, navigovať, uvariť kávu hosťom a držať priestor v pohode. Medzi tým sa dá aj učiť.',
+ tasks:['check-in návštev a členov','správa rezervácií zasadačiek','drobná administratíva','príprava eventov v priestore'],
+ req:['18+','angličtina B1+ (medzinárodní členovia)','reprezentatívne vystupovanie'],
+ perks:['voľný prístup do coworku aj mimo zmien','networking s startupmi','pokojné hodiny na vlastné štúdium'],
+ about:'Coworking pre 120 členov v centre Bratislavy.'},
+{id:21,title:'Zadávanie dát — home office',company:'DataDesk s.r.o.',cat:'Administratíva',city:'Remote',type:'brigáda',
+ pay:'5,90 € / h',when:'min. 8 h týždenne, kedykoľvek',start:'ihneď',spots:5,days:2,
+ desc:'Prepisuješ a kontroluješ produktové dáta v tabuľkách. Nudné? Trochu. Ale z gauča, s vlastnou hudbou a kedykoľvek chceš.',
+ tasks:['prepis údajov podľa šablóny','kontrola duplicít','označovanie chýb v katalógu'],
+ req:['vlastný počítač','presnosť — kontrolujeme vzorky','základy Excelu / Sheets'],
+ perks:['100 % remote','flexibilný objem hodín','výplata 2× mesačne'],
+ about:'Spracovanie dát pre e-shopy, tím 15 ľudí, polovica remote.'},
+{id:22,title:'Junior podpora — chat',company:'AppKit',cat:'IT',city:'Remote',type:'part-time',
+ pay:'7,00 € / h',when:'zmeny 16–22 h, 3× týždenne',start:'dohodou',spots:2,days:4,
+ desc:'Večerná zákaznícka podpora cez chat pre slovenskú aplikáciu. Naučíš sa produkt, odpovedáš na otázky, ťažšie veci eskaluješ vývojárom.',
+ tasks:['odpovede na chate a e-maily','reprodukcia nahlásených chýb','zápis do ticketov'],
+ req:['pekná písaná slovenčina','trpezlivosť','technické myslenie výhodou'],
+ perks:['remote','reálna skúsenosť z IT firmy','najlepší z podpory idú k nám do QA'],
+ about:'Slovenský SaaS produkt, 25 ľudí, remote-first.'},
+{id:23,title:'Roznos letákov + geotagging',company:'CityPromo',cat:'Eventy',city:'Prešov',type:'brigáda',
+ pay:'5,00 € / h + bonus za rajón',when:'kedykoľvek cez deň, min. 3 h v kuse',start:'ihneď',spots:8,days:1,
+ desc:'Roznos do schránok s appkou, ktorá ti počíta trasu — žiadne podvádzanie s vyhodenými letákmi, žiadne dohady o odrobenom čase.',
+ tasks:['roznos podľa pridelenej trasy v appke','fotoreport z rajónu'],
+ req:['16+','smartfón s GPS','chuť sa prejsť'],
+ perks:['pohyb namiesto posilky','bonus +10 € za kompletný rajón','plat podľa GPS záznamu, férovo'],
+ about:'Lokálna distribučná agentúra pre východné Slovensko.'},
+{id:24,title:'Asistent/ka na plavárni',company:'Mestská plaváreň PO',cat:'Predaj',city:'Prešov',type:'brigáda',
+ pay:'5,40 € / h',when:'víkendy 9–17 h',start:'ihneď',spots:2,days:3,
+ desc:'Recepcia a šatňa mestskej plavárne cez víkendy — vstupy, skrinky, požičiavanie plaveckých pomôcok.',
+ tasks:['predaj vstupov','výdaj kľúčov od skriniek','dozor v šatniach'],
+ req:['16+','spoľahlivosť','plávať nemusíš 🙂'],
+ perks:['voľný vstup na plaváreň','pokojné prostredie','stabilné víkendové zmeny'],
+ about:'Mestské športové zariadenie, brigádnikov berieme celoročne.'}
+];
+
+/* ============ stav ============ */
+const P=new URLSearchParams(location.search);
+let f={cat:P.get('kat')&&CATS.includes(P.get('kat'))?P.get('kat'):'Všetko',
+       city:P.get('mesto')&&CITIES.includes(P.get('mesto'))?P.get('mesto'):'Všetko',
+       type:'Všetko',q:P.get('q')||''};
+
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+
+/* ============ filtre ============ */
+function drawFilters(){
+  $('#catRow').innerHTML=['Všetko',...CATS].map(c=>
+    `<button class="fchip ${f.cat===c?'on':''}" data-cat="${c}">${c}</button>`).join('');
+  $('#fCity').innerHTML=['Všetko',...CITIES].map(c=>
+    `<option ${f.city===c?'selected':''}>${c==='Všetko'?'Mesto: všetko':c}</option>`).join('');
+  $('#fQ').value=f.q;
+}
+document.addEventListener('click',e=>{
+  const b=e.target.closest('[data-cat]');
+  if(b){f.cat=b.dataset.cat;drawFilters();drawList();}
+  const jc=e.target.closest('[data-job]');
+  if(jc){openJob(+jc.dataset.job);}
+});
+$('#fCity').addEventListener('change',e=>{f.city=e.target.value.replace('Mesto: všetko','Všetko');drawList();});
+$('#fType').addEventListener('change',e=>{f.type=e.target.value.replace('Typ: všetko','Všetko');drawList();});
+$('#fQ').addEventListener('input',e=>{f.q=e.target.value;drawList();});
+
+/* ============ zoznam ============ */
+function filtered(){
+  let l=JOBS;
+  if(f.cat!=='Všetko')l=l.filter(j=>j.cat===f.cat);
+  if(f.city!=='Všetko')l=l.filter(j=>j.city===f.city);
+  if(f.type!=='Všetko')l=l.filter(j=>j.type===f.type);
+  if(f.q){const q=f.q.toLowerCase();
+    l=l.filter(j=>(j.title+' '+j.company+' '+j.desc+' '+j.city).toLowerCase().includes(q));}
+  return l;
+}
+function drawList(){
+  const l=filtered();
+  $('#cnt').textContent=l.length;
+  $('#list').innerHTML=l.map(j=>`
+    <button class="jc" data-job="${j.id}" aria-haspopup="dialog">
+      ${j.days<=2?'<span class="new">Nové</span>':''}
+      <div class="row">
+        <span class="pill vio">${esc(j.cat)}</span>
+        <span class="pill">${esc(j.city)}</span>
+        <span class="pill typ">${esc(j.type)}</span>
+      </div>
+      <h3>${esc(j.title)}</h3>
+      <div class="pay">${esc(j.pay)}</div>
+      <div class="co"><span>${esc(j.company)}</span><span>pred ${j.days} d</span></div>
+    </button>`).join('')||'<div class="none">Žiadna ponuka nesedí filtrom — skús ich uvoľniť.</div>';
+  if(!REDUCED){
+    requestAnimationFrame(()=>{
+      document.querySelectorAll('.jc').forEach((el,i)=>setTimeout(()=>el.classList.add('in'),36*i));
+    });
+  }
+}
+
+/* ============ detail ============ */
+const mb=$('#mb'),md=$('#md');
+function openJob(id,push=true){
+  const j=JOBS.find(j=>j.id===id);if(!j)return;
+  md.innerHTML=`
+    <button class="x" id="mx">Zavrieť ✕</button>
+    <div class="row" style="display:flex;gap:.45rem;flex-wrap:wrap">
+      <span class="pill vio">${esc(j.cat)}</span><span class="pill">${esc(j.city)}</span><span class="pill typ">${esc(j.type)}</span>
+    </div>
+    <h2>${esc(j.title)}</h2>
+    <div class="payline">${esc(j.pay)}</div>
+    <p>${esc(j.desc)}</p>
+    <div class="facts">
+      <div class="fact"><div class="k">Kedy</div><div class="v">${esc(j.when||'—')}</div></div>
+      <div class="fact"><div class="k">Nástup</div><div class="v">${esc(j.start||'—')}</div></div>
+      <div class="fact"><div class="k">Voľné miesta</div><div class="v">${j.spots}</div></div>
+      <div class="fact"><div class="k">Pridané</div><div class="v">${j.days===0?'dnes':'pred '+j.days+' d'}</div></div>
+    </div>
+    ${j.tasks.length?`<h4>Čo budeš robiť</h4><ul>${j.tasks.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    ${j.req.length?`<h4>Čo potrebuješ</h4><ul>${j.req.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    ${j.perks.length?`<h4>Čo dostaneš navyše</h4><ul>${j.perks.map(t=>`<li>${esc(t)}</li>`).join('')}</ul>`:''}
+    <div class="cofoot">
+      <div class="who"><b>${esc(j.company)}</b>${j.about?'<br>'+esc(j.about):''}</div>
+      <div class="acts">
+        <a class="btn p" href="app.html">Prihlásiť sa na ponuku →</a>
+        <a class="btn g" href="app.html">Napísať firme</a>
+      </div>
+      <div class="hint">Prihlásenie aj správy bežia cez tvoj Jobsy účet — vytvoríš si ho za 3 minúty a firma hneď uvidí tvoju dostupnosť.</div>
+    </div>`;
+  mb.classList.add('show');
+  document.body.style.overflow='hidden';
+  if(push)history.replaceState(null,'','#job-'+id);
+  $('#mx').addEventListener('click',closeJob);
+  $('#mx').focus();
+}
+function closeJob(){
+  mb.classList.remove('show');
+  document.body.style.overflow='';
+  history.replaceState(null,'',location.pathname+location.search);
+}
+mb.addEventListener('click',e=>{if(e.target===mb)closeJob();});
+addEventListener('keydown',e=>{if(e.key==='Escape'&&mb.classList.contains('show'))closeJob();});
+
+/* ---- spotlight sleduje kurzor na kartách (delegovane, prežije prekreslenie) ---- */
+document.addEventListener('pointermove',e=>{
+  const c=e.target.closest&&e.target.closest('.jc');
+  if(!c)return;
+  const r=c.getBoundingClientRect();
+  c.style.setProperty('--mx',((e.clientX-r.left)/r.width*100).toFixed(1)+'%');
+  c.style.setProperty('--my',((e.clientY-r.top)/r.height*100).toFixed(1)+'%');
+});
+
+/* ---- prechod stránky: vstup aj odchod ---- */
+const wipe=document.getElementById('wipe');
+requestAnimationFrame(()=>requestAnimationFrame(()=>wipe.classList.add('off')));
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a');if(!a)return;
+  const href=a.getAttribute('href')||'';
+  if(!/^(index|app|podmienky|sukromie)\.html/.test(href))return;
+  if(e.ctrlKey||e.metaKey||a.target==='_blank')return;
+  e.preventDefault();
+  if(REDUCED){location.href=href;return;}
+  wipe.classList.remove('off');wipe.classList.add('out');
+  setTimeout(()=>{location.href=href;},480);
+});
+addEventListener('pageshow',e=>{if(e.persisted){wipe.classList.add('off');wipe.classList.remove('out');}});
+
+/* ---- ambientné bodky reagujúce na myš ---- */
+(function(){
+  if(REDUCED)return;
+  const cv=document.getElementById('dots'),ctx=cv.getContext('2d');
+  const N=innerWidth<700?60:140;
+  let W,H;
+  function size(){
+    W=cv.width=innerWidth*devicePixelRatio;
+    H=cv.height=innerHeight*devicePixelRatio;
+    cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  }
+  size();addEventListener('resize',size);
+  const dots=Array.from({length:N},()=>({
+    x:Math.random(),y:Math.random(),
+    vx:(Math.random()-.5)*.0004,vy:(Math.random()-.5)*.0004,
+    r:.6+Math.random()*1.5,s:Math.random()*6.28
+  }));
+  let mx=-1e4,my=-1e4,sx=innerWidth/2,sy=innerHeight/2;
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;});
+  document.addEventListener('pointerleave',()=>{mx=my=-1e4;});
+  function frame(t){
+    requestAnimationFrame(frame);
+    if(document.hidden)return;
+    ctx.clearRect(0,0,W,H);
+    const dpr=devicePixelRatio;
+    /* mäkká aura, ktorá s oneskorením pláva za kurzorom */
+    sx+=(((mx>-9000)?mx:innerWidth/2)-sx)*.055;
+    sy+=(((my>-9000)?my:innerHeight/2)-sy)*.055;
+    if(mx>-9000){
+      const g=ctx.createRadialGradient(sx*dpr,sy*dpr,0,sx*dpr,sy*dpr,240*dpr);
+      g.addColorStop(0,'rgba(124,92,255,.085)');
+      g.addColorStop(.55,'rgba(61,232,255,.03)');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    }
+    for(const d of dots){
+      d.x+=d.vx;d.y+=d.vy;
+      if(d.x<0||d.x>1)d.vx*=-1;
+      if(d.y<0||d.y>1)d.vy*=-1;
+      const par=(d.r-.6)/1.5;
+      const px=d.x*innerWidth+(sx-innerWidth/2)*.028*par,
+            py=d.y*innerHeight+(sy-innerHeight/2)*.028*par;
+      const dist=Math.hypot(px-mx,py-my);
+      const glow=Math.max(0,1-dist/190);
+      const tw=.22+.14*Math.sin(t*.001+d.s);
+      ctx.beginPath();
+      ctx.arc(px*dpr,py*dpr,(d.r+glow*1.8)*dpr,0,6.283);
+      ctx.fillStyle=glow>0
+        ?`rgba(124,92,255,${(tw+glow*.55).toFixed(3)})`
+        :`rgba(238,240,255,${(tw*.45).toFixed(3)})`;
+      ctx.fill();
+    }
+  }
+  requestAnimationFrame(frame);
+})();
+
+/* ============ štart ============ */
+drawFilters();drawList();
+const h0=location.hash.match(/^#job-(\d+)$/);
+if(h0)openJob(+h0[1],false);
+/* skutočné inzeráty zo Supabase — statické slúžia len ako fallback */
+if(sb){
+  sb.from('jobs').select('*').eq('active',true).order('created_at',{ascending:false})
+    .then(({data,error})=>{
+      if(error||!data||!data.length)return;
+      JOBS.length=0;
+      data.forEach(r=>JOBS.push(mapRow(r)));
+      drawList();
+      const h=location.hash.match(/^#job-(\d+)$/);
+      if(h&&!mb.classList.contains('show'))openJob(+h[1],false);
+    });
+}
+})();
+</script>
+</body>
+</html>

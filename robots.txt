@@ -1,0 +1,4 @@
+User-agent: *
+Allow: /
+Disallow: /app.html
+Sitemap: https://jobsy.sk/sitemap.xml

@@ -1,0 +1,1094 @@
+<!DOCTYPE html>
+<html lang="sk">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jobsy.sk — Aplikácia</title>
+<meta name="theme-color" content="#0A0A14">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='8' fill='%230A0A14'/%3E%3Ccircle cx='11' cy='16' r='4' fill='%237C5CFF'/%3E%3Ccircle cx='21' cy='16' r='4' fill='%23FFD84D'/%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;600;800&family=Space+Grotesk:wght@300;400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0A0A14;--panel:#10101E;--panel2:#161628;
+  --paper:#EEF0FF;--mute:rgba(238,240,255,.5);
+  --vio:#7C5CFF;--cyan:#3DE8FF;--sun:#FFD84D;
+  --ok:#4ADE80;--bad:#FF6B6B;
+  --rule:rgba(238,240,255,.12);
+  --display:'Unbounded',sans-serif;--body:'Space Grotesk',system-ui,sans-serif;--mono:'JetBrains Mono',monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--paper);font-family:var(--body);font-weight:300;-webkit-font-smoothing:antialiased;min-height:100vh}
+body::before{content:'';position:fixed;inset:0;z-index:0;pointer-events:none;
+  background:radial-gradient(60% 50% at 80% 0%,rgba(124,92,255,.13),transparent 60%),
+             radial-gradient(50% 40% at 10% 100%,rgba(61,232,255,.07),transparent 60%)}
+#app{position:relative;z-index:1;min-height:100vh;display:flex;flex-direction:column}
+::selection{background:var(--sun);color:var(--bg)}
+:focus-visible{outline:2px solid var(--sun);outline-offset:3px}
+a{color:inherit}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+input,select,textarea{font:inherit;color:var(--paper);background:var(--panel2);
+  border:1px solid var(--rule);border-radius:12px;padding:.8rem 1rem;width:100%;outline:none;
+  transition:border-color .25s}
+input:focus,select:focus,textarea:focus{border-color:var(--vio)}
+textarea{resize:vertical;min-height:90px}
+label{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mute);display:block;margin:.9rem 0 .4rem}
+
+/* ---------- topbar ---------- */
+.top{display:flex;align-items:center;justify-content:space-between;gap:1rem;
+  padding:.9rem clamp(16px,3vw,32px);border-bottom:1px solid var(--rule);
+  position:sticky;top:0;background:rgba(10,10,20,.85);backdrop-filter:blur(10px);z-index:20}
+.logo{font-family:var(--display);font-weight:800;font-size:1.05rem;text-decoration:none}
+.logo b{color:var(--sun)}
+.top nav{display:flex;gap:.4rem;flex-wrap:wrap}
+.tab{font-family:var(--mono);font-size:11px;letter-spacing:.12em;text-transform:uppercase;
+  padding:.55rem .95rem;border-radius:100px;color:var(--mute);transition:.25s}
+.tab:hover{color:var(--paper)}
+.tab.on{background:var(--vio);color:#fff}
+.tab .bdg{display:inline-block;min-width:17px;text-align:center;background:var(--sun);color:var(--bg);
+  border-radius:100px;font-size:9.5px;padding:1px 4px;margin-left:5px;font-weight:500}
+.uchip{display:flex;align-items:center;gap:.7rem;font-family:var(--mono);font-size:11px}
+.uchip .role{color:var(--sun);letter-spacing:.1em;text-transform:uppercase}
+.uchip button{color:var(--mute);text-decoration:underline;text-underline-offset:3px}
+.uchip button:hover{color:var(--bad)}
+
+/* ---------- layout ---------- */
+.page{flex:1;width:100%;max-width:1180px;margin:0 auto;padding:clamp(18px,3vw,36px)}
+.h-page{font-family:var(--display);font-weight:600;font-size:clamp(1.4rem,3vw,2rem);
+  letter-spacing:-.02em;margin-bottom:.4rem}
+.sub{color:var(--mute);font-size:.95rem;margin-bottom:1.8rem}
+.grid{display:grid;gap:1rem}
+.g3{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.g2{grid-template-columns:repeat(auto-fit,minmax(300px,1fr))}
+
+/* ---------- cards ---------- */
+.panel{background:var(--panel);border:1px solid var(--rule);border-radius:18px;padding:1.4rem}
+.stat .k{font-family:var(--mono);font-size:10.5px;letter-spacing:.18em;text-transform:uppercase;color:var(--mute)}
+.stat .v{font-family:var(--display);font-weight:600;font-size:2rem;margin-top:.4rem}
+.stat .v small{font-size:.9rem;color:var(--mute);font-family:var(--body);font-weight:300}
+.jcard{display:flex;flex-direction:column;gap:.7rem}
+.jcard h3{font-family:var(--display);font-weight:600;font-size:1.05rem;letter-spacing:-.01em}
+.jcard .pay{font-family:var(--mono);font-size:12.5px;color:var(--sun)}
+.jcard p{font-size:.9rem;line-height:1.55;color:var(--mute)}
+.jmeta{display:flex;flex-wrap:wrap;gap:.45rem}
+.pill{font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;border:1px solid var(--rule);
+  border-radius:100px;padding:.3rem .7rem;color:var(--mute)}
+.pill.vio{border-color:rgba(124,92,255,.5);color:var(--vio)}
+.jfoot{display:flex;justify-content:space-between;align-items:center;gap:.8rem;
+  border-top:1px solid var(--rule);padding-top:.9rem;margin-top:.2rem}
+.jfoot .co{font-family:var(--mono);font-size:11px;color:var(--mute)}
+
+/* ---------- buttons ---------- */
+.btn{display:inline-flex;align-items:center;gap:.55rem;font-family:var(--mono);font-size:11px;
+  letter-spacing:.14em;text-transform:uppercase;padding:.75rem 1.3rem;border-radius:100px;
+  transition:.25s;text-decoration:none;white-space:nowrap}
+.btn.p{background:var(--sun);color:var(--bg)}
+.btn.p:hover{background:var(--vio);color:#fff}
+.btn.g{border:1px solid var(--rule);color:var(--paper)}
+.btn.g:hover{border-color:var(--sun);color:var(--sun)}
+.btn.ok{background:rgba(74,222,128,.14);color:var(--ok);border:1px solid rgba(74,222,128,.35)}
+.btn.no{background:rgba(255,107,107,.12);color:var(--bad);border:1px solid rgba(255,107,107,.3)}
+.btn.s{padding:.5rem .9rem;font-size:10px}
+.btn[disabled]{opacity:.45;pointer-events:none}
+
+/* ---------- filters ---------- */
+.filters{display:flex;flex-wrap:wrap;gap:.5rem;margin-bottom:1.4rem}
+.fchip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;border:1px solid var(--rule);
+  border-radius:100px;padding:.5rem 1rem;color:var(--mute);transition:.25s}
+.fchip.on{background:var(--vio);border-color:var(--vio);color:#fff}
+.filters input,.filters select{width:auto;min-width:150px;padding:.5rem .9rem;border-radius:100px;font-size:.88rem}
+
+/* ---------- table ---------- */
+.tbl{width:100%;border-collapse:collapse;font-size:.9rem}
+.tbl th{font-family:var(--mono);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--mute);text-align:left;padding:.7rem .8rem;border-bottom:1px solid var(--rule)}
+.tbl td{padding:.75rem .8rem;border-bottom:1px solid var(--rule);vertical-align:middle}
+.tbl tr:hover td{background:rgba(238,240,255,.025)}
+.tag{font-family:var(--mono);font-size:10px;letter-spacing:.08em;border-radius:100px;padding:.25rem .6rem}
+.tag.worker{background:rgba(61,232,255,.12);color:var(--cyan)}
+.tag.company{background:rgba(124,92,255,.16);color:#B9A5FF}
+.tag.admin{background:rgba(255,216,77,.14);color:var(--sun)}
+.tag.wait{background:rgba(238,240,255,.08);color:var(--mute)}
+.tag.ok{background:rgba(74,222,128,.14);color:var(--ok)}
+.tag.no{background:rgba(255,107,107,.12);color:var(--bad)}
+.tag.off{background:rgba(255,107,107,.12);color:var(--bad)}
+.tag.act{background:rgba(74,222,128,.14);color:var(--ok)}
+
+/* ---------- auth ---------- */
+.auth{min-height:100vh;display:grid;place-items:center;padding:2rem}
+.auth-card{width:min(94vw,420px);background:var(--panel);border:1px solid var(--rule);
+  border-radius:22px;padding:clamp(1.6rem,4vw,2.4rem)}
+.auth-card .logo{font-size:1.4rem;display:block;margin-bottom:.4rem}
+.auth-card .sub{margin-bottom:1.2rem}
+.demo{display:flex;flex-wrap:wrap;gap:.5rem;margin-top:1.2rem;padding-top:1.2rem;border-top:1px solid var(--rule)}
+.seg{display:flex;gap:.4rem;margin:.4rem 0 .2rem}
+.seg button{flex:1;font-family:var(--mono);font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  border:1px solid var(--rule);border-radius:12px;padding:.7rem;color:var(--mute);transition:.25s}
+.seg button.on{background:var(--vio);border-color:var(--vio);color:#fff}
+.err{color:var(--bad);font-size:.85rem;margin-top:.8rem;font-family:var(--mono)}
+.note{font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--mute);
+  margin-top:1.1rem;line-height:1.6}
+
+/* ---------- chat ---------- */
+.chat{display:grid;grid-template-columns:260px 1fr;gap:0;border:1px solid var(--rule);
+  border-radius:18px;overflow:hidden;height:min(64vh,560px);background:var(--panel)}
+.contacts{border-right:1px solid var(--rule);overflow-y:auto}
+.contact{display:flex;flex-direction:column;gap:.15rem;width:100%;text-align:left;
+  padding:.9rem 1rem;border-bottom:1px solid var(--rule);transition:.2s}
+.contact:hover{background:rgba(238,240,255,.03)}
+.contact.on{background:rgba(124,92,255,.14)}
+.contact .n{font-weight:400;font-size:.92rem}
+.contact .r{font-family:var(--mono);font-size:10px;color:var(--mute);letter-spacing:.08em}
+.thread{display:flex;flex-direction:column}
+.msgs{flex:1;overflow-y:auto;padding:1.1rem;display:flex;flex-direction:column;gap:.55rem}
+.msg{max-width:76%;padding:.6rem .9rem;border-radius:14px;font-size:.9rem;line-height:1.45}
+.msg.me{align-self:flex-end;background:var(--vio);color:#fff;border-bottom-right-radius:4px}
+.msg.them{align-self:flex-start;background:var(--panel2);border:1px solid var(--rule);border-bottom-left-radius:4px}
+.msg .t{display:block;font-family:var(--mono);font-size:9px;opacity:.6;margin-top:.25rem}
+.composer{display:flex;gap:.6rem;padding:.8rem;border-top:1px solid var(--rule)}
+.composer input{border-radius:100px}
+.empty{color:var(--mute);font-size:.9rem;display:grid;place-items:center;height:100%;padding:2rem;text-align:center}
+
+/* ---------- modal ---------- */
+.modal-bg{position:fixed;inset:0;background:rgba(6,6,12,.72);backdrop-filter:blur(4px);
+  display:grid;place-items:center;z-index:40;padding:1.2rem}
+.modal{width:min(94vw,520px);background:var(--panel);border:1px solid var(--rule);
+  border-radius:20px;padding:1.8rem;max-height:88vh;overflow-y:auto}
+.modal h3{font-family:var(--display);font-weight:600;font-size:1.2rem;margin-bottom:.4rem}
+
+.banner{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--bg);
+  background:var(--sun);text-align:center;padding:.45rem .8rem}
+
+@media(max-width:1120px) and (min-width:761px){
+  .page{padding:clamp(16px,2.5vw,28px)}
+  .g2{grid-template-columns:1fr 1fr}
+}
+@media(max-width:760px){
+  .chat{grid-template-columns:1fr;height:72vh}
+  .contacts{display:flex;overflow-x:auto;border-right:none;border-bottom:1px solid var(--rule)}
+  .contact{min-width:150px;border-bottom:none;border-right:1px solid var(--rule)}
+  .top{padding:.7rem 14px}
+  .top nav{order:3;width:100%;overflow-x:auto;flex-wrap:nowrap;scrollbar-width:none}
+  .top nav::-webkit-scrollbar{display:none}
+  .tab{padding:.5rem .8rem;white-space:nowrap}
+  .uchip{font-size:10px;gap:.5rem}
+  .page{padding:16px 14px 60px}
+  .panel{padding:1.1rem;overflow-x:auto}
+  .tbl{font-size:.82rem;min-width:520px}
+  .tbl th,.tbl td{padding:.55rem .55rem}
+  .h-page{font-size:1.3rem}
+  .stat .v{font-size:1.6rem}
+  .modal{padding:1.3rem}
+  .msg{max-width:88%}
+  .filters input,.filters select{flex:1;min-width:0}
+}
+
+/* ===== zladenie s webom ===== */
+#dots{position:fixed;inset:0;z-index:0;pointer-events:none}
+#wipe{position:fixed;inset:0;z-index:80;pointer-events:none;
+  background:linear-gradient(120deg,var(--vio),#12122a 55%,var(--sun));
+  transform-origin:top;transform:scaleY(1);
+  transition:transform .6s cubic-bezier(.83,0,.17,1)}
+#wipe.off{transform:scaleY(0)}
+#wipe.out{transform-origin:bottom;transform:scaleY(1);transition-duration:.5s}
+@media(prefers-reduced-motion:reduce){#wipe{display:none}}
+
+.h-page{background:linear-gradient(100deg,var(--paper) 25%,var(--vio) 62%,var(--cyan) 95%);
+  -webkit-background-clip:text;background-clip:text;-webkit-text-fill-color:transparent}
+.banner{background:linear-gradient(90deg,rgba(124,92,255,.30),rgba(61,232,255,.20));color:var(--paper)}
+.panel{background:linear-gradient(180deg,rgba(26,27,48,.72),rgba(12,13,24,.82));border-radius:18px}
+.auth{position:relative;overflow:hidden}
+.auth::before,.auth::after{content:'';position:absolute;border-radius:50%;
+  filter:blur(70px);pointer-events:none;opacity:.55}
+.auth::before{width:420px;height:420px;left:-120px;top:-80px;
+  background:radial-gradient(circle,rgba(124,92,255,.45),transparent 70%)}
+.auth::after{width:380px;height:380px;right:-100px;bottom:-80px;
+  background:radial-gradient(circle,rgba(61,232,255,.30),transparent 70%)}
+.auth-card{background:linear-gradient(180deg,rgba(26,27,48,.82),rgba(12,13,24,.90));
+  backdrop-filter:blur(12px);border-radius:22px;
+  box-shadow:0 30px 80px rgba(0,0,0,.45)}
+.top .logo:hover b{color:var(--cyan)}
+.tab:hover{color:var(--sun)}
+</style>
+</head>
+<body>
+<canvas id="dots" aria-hidden="true"></canvas>
+<div id="wipe" aria-hidden="true"></div>
+<div id="app"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script>
+window.SB_URL='https://hcxocjediijwpxfnwfbt.supabase.co';
+window.SB_KEY='sb_publishable_-wRV4wAE8HMljOzp3ZXBSA_Tk9VS3ZB';
+</script>
+<script>
+(function(){
+'use strict';
+const sb=(typeof supabase!=='undefined'&&window.SB_URL)?supabase.createClient(window.SB_URL,window.SB_KEY):null;
+
+/* ---- skutočné dáta zo Supabase ---- */
+let R={jobs:[],apps:[],msgs:[],contacts:[],users:[],alljobs:[],stats:null};
+function njob(r){return{id:r.id,companyId:r.company_id,title:r.title,cat:r.cat,city:r.city,
+  type:r.type||'brigáda',pay:r.pay,desc:r.descr||'',active:r.active,
+  companyName:r.company_name||(r.company&&r.company.name)||'—',
+  when:r.when_txt||'',start:r.start_txt||'',spots:r.spots||1,
+  tasks:r.tasks||'',reqs:r.req||'',perks:r.perks||''}}
+async function loadRealData(){
+  if(!me||!me.real||!sb)return;
+  try{
+    const {data:jobs}=await sb.from('jobs')
+      .select('*, company:profiles!jobs_company_id_fkey(name)')
+      .order('created_at',{ascending:false});
+    R.jobs=(jobs||[]).map(njob);
+    if(me.role==='worker'){
+      const {data:apps}=await sb.from('applications')
+        .select('*, job:jobs(id,title,company_id,company_name)')
+        .eq('worker_id',me.id).order('created_at',{ascending:false});
+      R.apps=(apps||[]).map(a=>({id:a.id,jobId:a.job_id,workerId:a.worker_id,status:a.status,
+        ts:new Date(a.created_at).getTime(),
+        jobTitle:a.job?a.job.title:'—',
+        companyId:a.job?a.job.company_id:null,
+        companyName:a.job?(a.job.company_name||'—'):'—'}));
+    }else{
+      const {data:apps}=await sb.from('applications')
+        .select('*, worker:profiles!applications_worker_id_fkey(name,city), job:jobs(id,company_id,title)')
+        .order('created_at',{ascending:false});
+      R.apps=(apps||[]).filter(a=>a.job&&a.job.company_id===me.id)
+        .map(a=>({id:a.id,jobId:a.job_id,workerId:a.worker_id,status:a.status,
+          ts:new Date(a.created_at).getTime(),jobTitle:a.job?a.job.title:'—',
+          workerName:a.worker?a.worker.name:'—',workerCity:a.worker?(a.worker.city||'—'):'—'}));
+    }
+  }catch(e){console.error('loadRealData',e);}
+}
+async function loadRealChat(){
+  if(!me||!me.real||!sb)return;
+  try{
+    const {data:msgs}=await sb.from('messages').select('*').order('created_at',{ascending:true});
+    R.msgs=(msgs||[]).map(m=>({id:m.id,from:m.sender_id,to:m.receiver_id,
+      text:m.body,ts:new Date(m.created_at).getTime()}));
+    const ids=new Set();
+    R.msgs.forEach(m=>{ids.add(m.from);ids.add(m.to);});
+    if(me.role==='worker')R.apps.forEach(a=>{if(a.companyId)ids.add(a.companyId);});
+    if(me.role==='company')R.apps.forEach(a=>ids.add(a.workerId));
+    ids.delete(me.id);
+    if(me.role==='admin'){
+      const {data:ps}=await sb.from('profiles').select('id,name,role,city').neq('id',me.id).limit(200);
+      R.contacts=ps||[];
+    }else if(ids.size){
+      const {data:ps}=await sb.from('profiles').select('id,name,role,city').in('id',[...ids]);
+      R.contacts=ps||[];
+    }else R.contacts=[];
+  }catch(e){console.error('loadRealChat',e);}
+}
+async function loadAdminData(){
+  if(!me||!me.real||me.role!=='admin'||!sb)return;
+  try{
+    const [{data:users},{data:jobs},{count:apps},{count:msgs}]=await Promise.all([
+      sb.from('profiles').select('*').order('created_at',{ascending:false}),
+      sb.from('jobs').select('*').order('created_at',{ascending:false}),
+      sb.from('applications').select('*',{count:'exact',head:true}),
+      sb.from('messages').select('*',{count:'exact',head:true})
+    ]);
+    R.users=users||[];
+    R.alljobs=(jobs||[]).map(j=>({id:j.id,companyId:j.company_id,companyName:j.company_name||'—',
+      title:j.title,cat:j.cat,city:j.city,active:j.active}));
+    R.stats={users:R.users.length,
+      workers:R.users.filter(u=>u.role==='worker').length,
+      companies:R.users.filter(u=>u.role==='company').length,
+      blocked:R.users.filter(u=>u.blocked).length,
+      jobs:R.alljobs.length,activeJobs:R.alljobs.filter(j=>j.active).length,
+      apps:apps||0,msgs:msgs||0};
+  }catch(e){console.error('loadAdminData',e);}
+}
+let chatSubbed=false;
+function subscribeChat(){
+  if(chatSubbed||!sb||!me||!me.real)return;
+  chatSubbed=true;
+  sb.channel('jobsy-msgs')
+    .on('postgres_changes',{event:'INSERT',schema:'public',table:'messages'},p=>{
+      const m=p.new;
+      if(m.sender_id!==me.id&&m.receiver_id!==me.id)return;
+      if(R.msgs.some(x=>x.id===m.id))return;
+      R.msgs.push({id:m.id,from:m.sender_id,to:m.receiver_id,
+        text:m.body,ts:new Date(m.created_at).getTime()});
+      const other=m.sender_id===me.id?m.receiver_id:m.sender_id;
+      const done=()=>{if(!modal)render();};
+      if(!R.contacts.some(c=>c.id===other))loadRealChat().then(done);
+      else done();
+    }).subscribe();
+}
+
+/* ================= DATA (demo, in-memory) ================= */
+const CATS=['Gastro','Sklad','Predaj','Eventy','Administratíva','IT'];
+const CITIES=['Bratislava','Nitra','Žilina','B. Bystrica','Prešov','Košice','Remote'];
+let uid=100;
+const DB={
+  users:[
+    {id:1,role:'admin',  name:'Admin Jobsy',     email:'admin@jobsy.sk', pass:'demo',city:'—',blocked:false},
+    {id:2,role:'company',name:'KaviaMo s.r.o.',  email:'firma@jobsy.sk', pass:'demo',city:'Bratislava',blocked:false},
+    {id:3,role:'company',name:'LogisPack a.s.',  email:'sklad@logispack.sk',pass:'demo',city:'Žilina',blocked:false},
+    {id:4,role:'company',name:'EventPro',        email:'ahoj@eventpro.sk',pass:'demo',city:'Košice',blocked:false},
+    {id:5,role:'worker', name:'Miška Horváthová',email:'miska@student.sk',pass:'demo',city:'Bratislava',blocked:false},
+    {id:6,role:'worker', name:'Tomáš Krajčí',    email:'worker@jobsy.sk',pass:'demo',city:'Žilina',blocked:false},
+    {id:7,role:'worker', name:'Katka Urbanová',  email:'katka@student.sk',pass:'demo',city:'Košice',blocked:false}
+  ],
+  jobs:[
+    {id:11,companyId:2,title:'Barista — víkendy',cat:'Gastro',city:'Bratislava',pay:'6,00 € / h',active:true,
+     desc:'Ranné a poobedné zmeny v kaviarni v centre. Zaškolíme, latte art naučíme. Tringelty tvoje.'},
+    {id:12,companyId:2,title:'Výpomoc v bistre',cat:'Gastro',city:'Bratislava',pay:'5,50 € / h + prepitné',active:true,
+     desc:'Obsluha a výdaj obedov, pondelok–piatok 11:00–14:30. Ideálne medzi prednáškami.'},
+    {id:13,companyId:3,title:'Skladník — nočná inventúra',cat:'Sklad',city:'Žilina',pay:'8,20 € / h',active:true,
+     desc:'Nárazové nočné inventúry, 2–3× do mesiaca. Príplatky v cene, odvoz z centra zabezpečený.'},
+    {id:14,companyId:3,title:'Balenie e-shop objednávok',cat:'Sklad',city:'Žilina',pay:'5,80 € / h',active:true,
+     desc:'Flexibilné zmeny 4–8 h, hlásiš sa v appke deň vopred. Sedavá práca, teplý sklad.'},
+    {id:15,companyId:4,title:'Hostes/ka — festival leto',cat:'Eventy',city:'Košice',pay:'9,00 € / h',active:true,
+     desc:'Vstupy, infopointy, welcome drinky. Tri festivalové víkendy, strava a doprava v cene.'},
+    {id:16,companyId:4,title:'Promo tím — ochutnávky',cat:'Eventy',city:'Košice',pay:'7,50 € / h',active:true,
+     desc:'Ochutnávky v obchodných centrách, piatky a soboty. Komunikatívnosť nutná, úsmev výhodou.'},
+    {id:17,companyId:4,title:'Sociálne siete — stáž',cat:'IT',city:'Remote',pay:'8,00 € / h',active:true,
+     desc:'Reels, príspevky, plánovanie. 10–15 h týždenne z domu. Portfólio z toho býva slušné.'},
+    {id:18,companyId:3,title:'Dáta — kontrola katalógu',cat:'Administratíva',city:'Remote',pay:'6,50 € / h',active:false,
+     desc:'Kontrola produktových dát v tabuľkách. Pozastavené — obsadené na tento mesiac.'}
+  ],
+  apps:[
+    {id:21,jobId:11,workerId:6,status:'wait',ts:Date.now()-86400e3*2},
+    {id:22,jobId:13,workerId:6,status:'ok',  ts:Date.now()-86400e3*5},
+    {id:23,jobId:11,workerId:5,status:'wait',ts:Date.now()-86400e3},
+    {id:24,jobId:15,workerId:7,status:'ok',  ts:Date.now()-86400e3*3},
+    {id:25,jobId:16,workerId:7,status:'no',  ts:Date.now()-86400e3*6}
+  ],
+  msgs:[
+    {id:31,from:3,to:6,text:'Ahoj Tomáš, inventúra štartuje vo štvrtok 21:00. Sedí ti to?',ts:Date.now()-3600e3*30},
+    {id:32,from:6,to:3,text:'Dobrý deň, áno, štvrtok mi vyhovuje. Mám prísť priamo do skladu?',ts:Date.now()-3600e3*29},
+    {id:33,from:3,to:6,text:'Áno, vrátnica ťa pustí, budeš na zozname. Teplé oblečenie netreba, sklad je vykurovaný.',ts:Date.now()-3600e3*28},
+    {id:34,from:4,to:7,text:'Katka, prihláška na festival prijatá 🎉 Detaily pošleme týždeň vopred.',ts:Date.now()-3600e3*70}
+  ]
+};
+const AUTOREPLY={
+  2:['Ďakujeme za správu! Ozveme sa do pár hodín.','Super, dáme vedieť čo najskôr 👍'],
+  3:['Prijaté, kolega z HR sa ozve dnes.','Ďakujeme, preveríme kapacity a napíšeme.'],
+  4:['Vďaka! Ohľadom termínov sa ozveme obratom.','Prijaté 🙌 čoskoro pošleme detaily.'],
+  5:['Ahoj! Ďakujem za správu, pozriem si to po prednáške.'],
+  6:['Zdravím, vďaka za info, dám vedieť ešte dnes.'],
+  7:['Ahoj, super, ozvem sa hneď ako budem pri počítači.']
+};
+
+/* ================= STATE ================= */
+let me=null, tab='overview', chatWith=null, modal=null, err='';
+let f={cat:'Všetko',city:'Všetko',q:''};
+let regMode=false, regRole='worker';
+
+/* ================= HELPERS ================= */
+const $=s=>document.querySelector(s);
+const esc=s=>String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const U=id=>DB.users.find(u=>u.id===id);
+const fmtT=ts=>{
+  const d=new Date(ts),n=new Date();
+  const same=d.toDateString()===n.toDateString();
+  return (same?'dnes ':'')+d.toLocaleDateString('sk-SK',same?{}:{day:'numeric',month:'numeric'})+
+    (same?'':' ')+d.toLocaleTimeString('sk-SK',{hour:'2-digit',minute:'2-digit'});
+};
+function myContacts(){
+  if(me.role==='admin')return DB.users.filter(u=>u.id!==me.id);
+  const ids=new Set();
+  if(me.role==='worker'){
+    DB.apps.filter(a=>a.workerId===me.id).forEach(a=>{
+      const j=DB.jobs.find(j=>j.id===a.jobId); if(j)ids.add(j.companyId);
+    });
+  }else{
+    DB.apps.forEach(a=>{
+      const j=DB.jobs.find(j=>j.id===a.jobId);
+      if(j&&j.companyId===me.id)ids.add(a.workerId);
+    });
+  }
+  DB.msgs.forEach(m=>{
+    if(m.from===me.id)ids.add(m.to);
+    if(m.to===me.id)ids.add(m.from);
+  });
+  ids.add(1); ids.delete(me.id);
+  return [...ids].map(U).filter(Boolean);
+}
+const thread=(a,b)=>DB.msgs.filter(m=>(m.from===a&&m.to===b)||(m.from===b&&m.to===a)).sort((x,y)=>x.ts-y.ts);
+const msgCount=()=>(me&&me.real)?R.msgs.filter(m=>m.to===me.id).length:DB.msgs.filter(m=>m.to===me.id).length;
+
+/* ================= ACTIONS ================= */
+window.act={
+  async login(e){
+    e.preventDefault();
+    const em=$('#f-email').value.trim().toLowerCase(),pw=$('#f-pass').value;
+    if(!sb){err='Supabase klient sa nenačítal — skontroluj pripojenie.';render();return;}
+    err='Prihlasujem…';render();
+    const {data,error}=await sb.auth.signInWithPassword({email:em,password:pw});
+    if(error){err='Nesprávny e-mail alebo heslo.';render();return;}
+    await loadRealProfile(data.user);
+  },
+  demo(id){me=U(id);err='';tab='overview';render();},
+  toReg(v){regMode=v;err='';render();},
+  setRole(r){regRole=r;render();},
+  async register(e){
+    e.preventDefault();
+    const n=$('#r-name').value.trim(),em=$('#r-email').value.trim(),pw=$('#r-pass').value;
+    if(!n||!em||pw.length<6){err='Vyplň meno, e-mail a heslo (min. 6 znakov).';render();return;}
+    if(!sb){err='Supabase klient sa nenačítal — skontroluj pripojenie.';render();return;}
+    err='Vytváram účet…';render();
+    const {data,error}=await sb.auth.signUp({email:em,password:pw,
+      options:{data:{role:regRole,name:n,city:$('#r-city').value}}});
+    if(error){err=error.message.includes('already')?'Tento e-mail už existuje.':'Registrácia zlyhala: '+error.message;render();return;}
+    if(!data.session){err='';regMode=false;
+      alert('Účet vytvorený! Skontroluj si e-mail a potvrď registráciu, potom sa prihlás.');render();return;}
+    await loadRealProfile(data.user);
+  },
+  logout(){if(sb)sb.auth.signOut();me=null;chatWith=null;regMode=false;render();},
+  tab(t){tab=t;render();},
+  filtCat(c){f.cat=c;render();},
+  filt(){f.city=$('#f-city').value;f.q=$('#f-q').value;render();},
+  async apply(jobId){
+    if(me.real){
+      const {error}=await sb.from('applications').insert({job_id:jobId,worker_id:me.id});
+      if(error&&!/duplicate|unique/i.test(error.message)){alert('Prihlásenie zlyhalo: '+error.message);return;}
+      await loadRealData();render();return;
+    }
+    if(DB.apps.some(a=>a.jobId===jobId&&a.workerId===me.id))return;
+    DB.apps.push({id:++uid,jobId,workerId:me.id,status:'wait',ts:Date.now()});
+    render();
+  },
+  async decide(appId,st){
+    if(me.real){
+      const a=R.apps.find(a=>a.id===appId);
+      const {error}=await sb.from('applications').update({status:st}).eq('id',appId);
+      if(error){alert('Nepodarilo sa uložiť: '+error.message);return;}
+      if(a){
+        const txt=st==='ok'
+          ?`Tvoja prihláška na „${a.jobTitle}" bola prijatá 🎉 Ozvi sa mi tu v správach ohľadom nástupu.`
+          :`Ďakujeme za prihlášku na „${a.jobTitle}", tentokrát sme vybrali niekoho iného. Skús ďalšie ponuky!`;
+        await sb.from('messages').insert({sender_id:me.id,receiver_id:a.workerId,body:txt});
+      }
+      await loadRealData();await loadRealChat();render();return;
+    }
+    const a=DB.apps.find(a=>a.id===appId);if(!a)return;
+    a.status=st;
+    const j=DB.jobs.find(j=>j.id===a.jobId);
+    DB.msgs.push({id:++uid,from:me.id,to:a.workerId,ts:Date.now(),
+      text:st==='ok'
+        ?`Tvoja prihláška na „${j.title}" bola prijatá 🎉 Ozvi sa mi tu v správach ohľadom nástupu.`
+        :`Ďakujeme za prihlášku na „${j.title}", tentokrát sme vybrali niekoho iného. Skús ďalšie ponuky!`});
+    render();
+  },
+  openJobForm(job){modal={type:'job',job:job||null};render();},
+  editJob(id){
+    const src=(me&&me.real)?R.jobs:DB.jobs;
+    const j=src.find(x=>x.id===id);
+    if(j)act.openJobForm(j);
+  },
+  async saveJob(e){
+    e.preventDefault();
+    const t=$('#j-title').value.trim(),d=$('#j-desc').value.trim(),p=$('#j-pay').value.trim();
+    if(!t||!d||!p){return;}
+    const extra={type:$('#j-type').value,when:$('#j-when').value.trim(),start:$('#j-start').value.trim(),
+      spots:Math.max(1,parseInt($('#j-spots').value)||1),
+      tasks:$('#j-tasks').value.trim(),reqs:$('#j-req').value.trim(),perks:$('#j-perks').value.trim()};
+    if(me.real){
+      const rec={title:t,descr:d,pay:p,cat:$('#j-cat').value,city:$('#j-city').value,
+        type:extra.type,when_txt:extra.when,start_txt:extra.start,spots:extra.spots,
+        tasks:extra.tasks,req:extra.reqs,perks:extra.perks,
+        company_id:me.id,company_name:me.name};
+      const q=modal.job?sb.from('jobs').update(rec).eq('id',modal.job.id):sb.from('jobs').insert(rec);
+      const {error}=await q;
+      if(error){alert('Uloženie zlyhalo: '+error.message);return;}
+      modal=null;await loadRealData();render();return;
+    }
+    if(modal.job){
+      Object.assign(modal.job,{title:t,desc:d,pay:p,cat:$('#j-cat').value,city:$('#j-city').value},extra);
+    }else{
+      DB.jobs.unshift(Object.assign({id:++uid,companyId:me.id,title:t,desc:d,pay:p,
+        cat:$('#j-cat').value,city:$('#j-city').value,active:true},extra));
+    }
+    modal=null;render();
+  },
+  async toggleJob(id){
+    if(me.real){
+      const j=R.jobs.find(j=>j.id===id)||R.alljobs.find(j=>j.id===id);if(!j)return;
+      await sb.from('jobs').update({active:!j.active}).eq('id',id);
+      await loadRealData();if(me.role==='admin')await loadAdminData();render();return;
+    }
+    const j=DB.jobs.find(j=>j.id===id);if(j)j.active=!j.active;render();
+  },
+  async delJob(id){
+    if(me.real){
+      if(!confirm('Naozaj zmazať inzerát? Zmiznú aj prihlášky naň.'))return;
+      await sb.from('jobs').delete().eq('id',id);
+      await loadRealData();if(me.role==='admin')await loadAdminData();render();return;
+    }
+    DB.jobs=DB.jobs.filter(j=>j.id!==id);
+    DB.apps=DB.apps.filter(a=>a.jobId!==id);
+    render();
+  },
+  closeModal(){modal=null;render();},
+  chat(id){chatWith=(me&&me.real)?id:+id;tab='chat';render();},
+  async send(e){
+    e.preventDefault();
+    const inp=$('#c-inp'),txt=inp.value.trim();
+    if(!txt||!chatWith)return;
+    if(me.real){
+      inp.value='';
+      const {data,error}=await sb.from('messages')
+        .insert({sender_id:me.id,receiver_id:chatWith,body:txt}).select().single();
+      if(error){alert('Odoslanie zlyhalo: '+error.message);return;}
+      if(data&&!R.msgs.some(x=>x.id===data.id))
+        R.msgs.push({id:data.id,from:data.sender_id,to:data.receiver_id,
+          text:data.body,ts:new Date(data.created_at).getTime()});
+      render();return;
+    }
+    DB.msgs.push({id:++uid,from:me.id,to:chatWith,text:txt,ts:Date.now()});
+    inp.value='';render();
+    const other=chatWith;
+    const canned=AUTOREPLY[other];
+    if(canned&&other!==me.id){
+      setTimeout(()=>{
+        DB.msgs.push({id:++uid,from:other,to:me.id,ts:Date.now(),
+          text:canned[(Math.random()*canned.length)|0]});
+        if(me&&tab==='chat')render();
+      },1400+Math.random()*1200);
+    }
+  },
+  async block(id){
+    if(me.real){
+      const u=R.users.find(u=>u.id===id);if(!u||u.role==='admin')return;
+      await sb.from('profiles').update({blocked:!u.blocked}).eq('id',id);
+      await loadAdminData();render();return;
+    }
+    const u=U(id);if(u&&u.role!=='admin')u.blocked=!u.blocked;render();
+  },
+  async delUser(id){
+    if(me.real){
+      const u=R.users.find(u=>u.id===id);if(!u||u.role==='admin')return;
+      if(!confirm('Naozaj zmazať používateľa? Zmiznú aj jeho inzeráty, prihlášky a správy.'))return;
+      await sb.from('profiles').delete().eq('id',id);
+      await loadAdminData();await loadRealChat();render();return;
+    }
+    const u=U(id);if(!u||u.role==='admin')return;
+    DB.users=DB.users.filter(x=>x.id!==id);
+    DB.jobs=DB.jobs.filter(j=>j.companyId!==id);
+    DB.apps=DB.apps.filter(a=>a.workerId!==id&&DB.jobs.some(j=>j.id===a.jobId));
+    DB.msgs=DB.msgs.filter(m=>m.from!==id&&m.to!==id);
+    if(chatWith===id)chatWith=null;
+    render();
+  }
+};
+
+/* ================= VIEWS ================= */
+function statCard(k,v,s){return `<div class="panel stat"><div class="k">${k}</div><div class="v">${v}${s?` <small>${s}</small>`:''}</div></div>`;}
+
+function jobCard(j,forWorker){
+  const co={name:(me&&me.real)?(j.companyName||'—'):(U(j.companyId)?U(j.companyId).name:'—')};
+  const appsSrc=(me&&me.real)?R.apps:DB.apps;
+  const applied=me&&appsSrc.find(a=>a.jobId===j.id&&a.workerId===me.id);
+  return `<div class="panel jcard">
+    <div class="jmeta"><span class="pill vio">${esc(j.cat)}</span><span class="pill">${esc(j.city)}</span>${j.active?'':'<span class="pill" style="color:var(--bad)">pozastavená</span>'}</div>
+    <h3>${esc(j.title)}</h3>
+    <div class="pay">${esc(j.pay)}</div>
+    <p>${esc(j.desc)}</p>
+    <div class="jfoot">
+      <span class="co">${esc(co?co.name:'—')}</span>
+      ${forWorker
+        ? (applied
+            ?`<span class="tag ${applied.status}">${applied.status==='wait'?'čaká sa':applied.status==='ok'?'prijatá':'zamietnutá'}</span>`
+            :`<button class="btn p s" onclick="act.apply(${j.id})" ${j.active?'':'disabled'}>Prihlásiť sa</button>`)
+        : ''}
+    </div>
+  </div>`;
+}
+
+function viewAuth(){
+  return `<div class="auth"><div class="auth-card">
+    <a class="logo" href="index.html" style="font-family:var(--display)">jobsy<b>.</b>sk</a>
+    <div class="sub">${regMode?'Nový účet za minútu.':'Prihlás sa do svojho účtu.'}</div>
+    ${regMode?`
+    <form onsubmit="act.register(event)">
+      <div class="seg">
+        <button type="button" class="${regRole==='worker'?'on':''}" onclick="act.setRole('worker')">Hľadám prácu</button>
+        <button type="button" class="${regRole==='company'?'on':''}" onclick="act.setRole('company')">Sme firma</button>
+      </div>
+      <label>${regRole==='worker'?'Meno a priezvisko':'Názov firmy'}</label>
+      <input id="r-name" placeholder="${regRole==='worker'?'Jana Nováková':'Firma s.r.o.'}">
+      <label>E-mail</label><input id="r-email" type="email" placeholder="ty@mail.sk">
+      <label>Heslo</label><input id="r-pass" type="password" placeholder="min. 4 znaky">
+      <label>Mesto</label>
+      <select id="r-city">${CITIES.map(c=>`<option>${c}</option>`).join('')}</select>
+      ${err?`<div class="err">${esc(err)}</div>`:''}
+      <div style="margin-top:1.3rem;display:flex;gap:.7rem;flex-wrap:wrap">
+        <button class="btn p" type="submit">Vytvoriť účet →</button>
+        <button class="btn g" type="button" onclick="act.toReg(false)">Späť</button>
+      </div>
+    </form>`
+    :`
+    <form onsubmit="act.login(event)">
+      <label>E-mail</label><input id="f-email" type="email" placeholder="ty@mail.sk" autocomplete="username">
+      <label>Heslo</label><input id="f-pass" type="password" placeholder="••••" autocomplete="current-password">
+      ${err?`<div class="err">${esc(err)}</div>`:''}
+      <div style="margin-top:1.3rem;display:flex;gap:.7rem;flex-wrap:wrap">
+        <button class="btn p" type="submit">Prihlásiť sa →</button>
+        <button class="btn g" type="button" onclick="act.toReg(true)">Registrácia</button>
+      </div>
+    </form>
+    <div class="demo">
+      <button class="btn g s" onclick="act.demo(6)">Demo: pracovník</button>
+      <button class="btn g s" onclick="act.demo(2)">Demo: firma</button>
+      <button class="btn g s" onclick="act.demo(1)">Demo: admin</button>
+    </div>`}
+    <div class="note">Demo verzia — dáta žijú len počas otvorenej stránky a po obnovení sa vrátia do východiskového stavu.</div>
+  </div></div>`;
+}
+
+function viewChat(){
+  if(me.real){
+    const contacts=R.contacts;
+    if(chatWith&&!contacts.some(c=>c.id===chatWith))chatWith=contacts[0]?contacts[0].id:null;
+    if(!chatWith&&contacts[0])chatWith=contacts[0].id;
+    const th=chatWith?R.msgs.filter(m=>(m.from===me.id&&m.to===chatWith)||(m.from===chatWith&&m.to===me.id)):[];
+    const other=chatWith?contacts.find(c=>c.id===chatWith):null;
+    return `
+    <h1 class="h-page">Správy</h1>
+    <div class="sub">Správy chodia naživo — druhá strana ich vidí okamžite.</div>
+    <div class="chat">
+      <div class="contacts">
+        ${contacts.length?contacts.map(c=>`
+          <button class="contact ${c.id===chatWith?'on':''}" onclick="act.chat('${c.id}')">
+            <span class="n">${esc(c.name)}</span>
+            <span class="r">${c.role==='company'?'firma':c.role==='admin'?'admin':'pracovník'} · ${esc(c.city||'—')}</span>
+          </button>`).join('')
+        :'<div class="empty">Zatiaľ žiadne kontakty.<br>Vzniknú prihlásením na ponuku.</div>'}
+      </div>
+      <div class="thread">
+        ${other?`
+        <div class="msgs" id="msgs">
+          ${th.length?th.map(m=>`
+            <div class="msg ${m.from===me.id?'me':'them'}">${esc(m.text)}<span class="t">${fmtT(m.ts)}</span></div>`).join('')
+          :`<div class="empty">Začni konverzáciu s ${esc(other.name)} 👋</div>`}
+        </div>
+        <form class="composer" onsubmit="act.send(event)">
+          <input id="c-inp" placeholder="Napíš správu…" autocomplete="off">
+          <button class="btn p" type="submit">Poslať</button>
+        </form>`
+        :'<div class="empty">Vyber kontakt vľavo.</div>'}
+      </div>
+    </div>`;
+  }
+  const contacts=myContacts();
+  if(chatWith&&!contacts.some(c=>c.id===chatWith))chatWith=contacts[0]?contacts[0].id:null;
+  if(!chatWith&&contacts[0])chatWith=contacts[0].id;
+  const th=chatWith?thread(me.id,chatWith):[];
+  const other=chatWith?U(chatWith):null;
+  return `
+  <h1 class="h-page">Správy</h1>
+  <div class="sub">Píš si priamo s ${me.role==='worker'?'firmami':me.role==='company'?'uchádzačmi':'kýmkoľvek'}.</div>
+  <div class="chat">
+    <div class="contacts">
+      ${contacts.length?contacts.map(c=>`
+        <button class="contact ${c.id===chatWith?'on':''}" onclick="act.chat('${c.id}')">
+          <span class="n">${esc(c.name)}</span>
+          <span class="r">${c.role==='company'?'firma':c.role==='admin'?'admin':'pracovník'} · ${esc(c.city)}</span>
+        </button>`).join('')
+      :'<div class="empty">Zatiaľ žiadne kontakty.<br>Vzniknú prihlásením na ponuku.</div>'}
+    </div>
+    <div class="thread">
+      ${other?`
+      <div class="msgs" id="msgs">
+        ${th.length?th.map(m=>`
+          <div class="msg ${m.from===me.id?'me':'them'}">${esc(m.text)}<span class="t">${fmtT(m.ts)}</span></div>`).join('')
+        :`<div class="empty">Začni konverzáciu s ${esc(other.name)} 👋</div>`}
+      </div>
+      <form class="composer" onsubmit="act.send(event)">
+        <input id="c-inp" placeholder="Napíš správu…" autocomplete="off">
+        <button class="btn p" type="submit">Poslať</button>
+      </form>`
+      :'<div class="empty">Vyber kontakt vľavo.</div>'}
+    </div>
+  </div>`;
+}
+
+function viewWorker(){
+  const real=!!me.real;
+  const jobsSrc=real?R.jobs:DB.jobs;
+  const myApps=real?R.apps:DB.apps.filter(a=>a.workerId===me.id);
+  if(tab==='overview'){
+    const rec=jobsSrc.filter(j=>j.active&&!myApps.some(a=>a.jobId===j.id)).slice(0,3);
+    return `
+    <h1 class="h-page">Ahoj, ${esc(me.name.split(' ')[0])} 👋</h1>
+    <div class="sub">Tu je tvoj prehľad.</div>
+    <div class="grid g3" style="margin-bottom:1.6rem">
+      ${statCard('Moje prihlášky',myApps.length)}
+      ${statCard('Prijaté',myApps.filter(a=>a.status==='ok').length)}
+      ${statCard('Správy',msgCount())}
+    </div>
+    <h1 class="h-page" style="font-size:1.15rem">Odporúčané pre teba</h1>
+    <div class="sub">Podľa mesta a kategórií, kde si ešte nebol/a.</div>
+    <div class="grid g2">${rec.map(j=>jobCard(j,true)).join('')||'<div class="sub">Zatiaľ žiadne ponuky.</div>'}</div>`;
+  }
+  if(tab==='jobs'){
+    let list=jobsSrc.filter(j=>j.active);
+    if(f.cat!=='Všetko')list=list.filter(j=>j.cat===f.cat);
+    if(f.city!=='Všetko')list=list.filter(j=>j.city===f.city);
+    if(f.q)list=list.filter(j=>(j.title+j.desc).toLowerCase().includes(f.q.toLowerCase()));
+    return `
+    <h1 class="h-page">Ponuky</h1>
+    <div class="sub">${list.length} aktívnych ponúk.</div>
+    <div class="filters">
+      ${['Všetko',...CATS].map(c=>`<button class="fchip ${f.cat===c?'on':''}" onclick="act.filtCat('${c}')">${c}</button>`).join('')}
+      <select id="f-city" onchange="act.filt()">${['Všetko',...CITIES].map(c=>`<option ${f.city===c?'selected':''}>${c}</option>`).join('')}</select>
+      <input id="f-q" placeholder="Hľadať…" value="${esc(f.q)}" oninput="act.filt()">
+    </div>
+    <div class="grid g2">${list.map(j=>jobCard(j,true)).join('')||'<div class="sub">Nič nesedí filtrom.</div>'}</div>`;
+  }
+  if(tab==='apps'){
+    return `
+    <h1 class="h-page">Moje prihlášky</h1>
+    <div class="sub">Stav uvidíš hneď, ako firma rozhodne.</div>
+    <div class="panel" style="padding:.4rem 0;overflow-x:auto">
+      <table class="tbl"><tr><th>Ponuka</th><th>Firma</th><th>Podaná</th><th>Stav</th><th></th></tr>
+      ${myApps.map(a=>{
+        let title,coName,coId=null;
+        if(real){title=a.jobTitle;coName=a.companyName;coId=a.companyId;}
+        else{const j=DB.jobs.find(j=>j.id===a.jobId);if(!j)return'';
+          title=j.title;const c=U(j.companyId);coName=c?c.name:'—';coId=j.companyId;}
+        return `<tr>
+          <td>${esc(title)}</td><td>${esc(coName)}</td><td>${fmtT(a.ts)}</td>
+          <td><span class="tag ${a.status}">${a.status==='wait'?'čaká sa':a.status==='ok'?'prijatá':'zamietnutá'}</span></td>
+          <td>${coId?`<button class="btn g s" onclick="act.chat('${coId}')">Chat</button>`:''}</td>
+        </tr>`;}).join('')||'<tr><td colspan="5" style="color:var(--mute)">Zatiaľ žiadne prihlášky.</td></tr>'}
+      </table>
+    </div>`;
+  }
+  return viewChat();
+}
+
+function viewCompany(){
+  const real=!!me.real;
+  const myJobs=real?R.jobs.filter(j=>j.companyId===me.id):DB.jobs.filter(j=>j.companyId===me.id);
+  const myApps=real?R.apps:DB.apps.filter(a=>myJobs.some(j=>j.id===a.jobId));
+  if(tab==='overview'){
+    return `
+    <h1 class="h-page">${esc(me.name)}</h1>
+    <div class="sub">Prehľad náboru.</div>
+    <div class="grid g3" style="margin-bottom:1.6rem">
+      ${statCard('Aktívne ponuky',myJobs.filter(j=>j.active).length,'z '+myJobs.length)}
+      ${statCard('Uchádzači',myApps.length)}
+      ${statCard('Čakajú na rozhodnutie',myApps.filter(a=>a.status==='wait').length)}
+    </div>
+    <button class="btn p" onclick="act.openJobForm()">+ Nová ponuka</button>`;
+  }
+  if(tab==='jobs'){
+    return `
+    <h1 class="h-page">Moje ponuky</h1>
+    <div class="sub">Uchádzačov schvaľuješ priamo tu.</div>
+    <div style="margin-bottom:1.2rem"><button class="btn p" onclick="act.openJobForm()">+ Nová ponuka</button></div>
+    <div class="grid" style="gap:1.2rem">
+    ${myJobs.map(j=>{
+      const apps=myApps.filter(a=>a.jobId===j.id);
+      return `<div class="panel">
+        <div style="display:flex;justify-content:space-between;gap:1rem;flex-wrap:wrap;align-items:flex-start">
+          <div>
+            <div class="jmeta" style="margin-bottom:.5rem"><span class="pill vio">${esc(j.cat)}</span><span class="pill">${esc(j.city)}</span><span class="tag ${j.active?'act':'off'}">${j.active?'aktívna':'pozastavená'}</span></div>
+            <h3 style="font-family:var(--display);font-weight:600">${esc(j.title)}</h3>
+            <div class="pay" style="font-family:var(--mono);font-size:12px;color:var(--sun);margin-top:.3rem">${esc(j.pay)}</div>
+          </div>
+          <div style="display:flex;gap:.5rem;flex-wrap:wrap">
+            <button class="btn g s" onclick="act.editJob(${j.id})">Upraviť</button>
+            <button class="btn g s" onclick="act.toggleJob(${j.id})">${j.active?'Pozastaviť':'Aktivovať'}</button>
+            <button class="btn no s" onclick="act.delJob(${j.id})">Zmazať</button>
+          </div>
+        </div>
+        ${apps.length?`
+        <table class="tbl" style="margin-top:1rem"><tr><th>Uchádzač</th><th>Mesto</th><th>Podaná</th><th>Stav</th><th></th></tr>
+        ${apps.map(a=>{
+          const wName=real?a.workerName:(U(a.workerId)?U(a.workerId).name:'—');
+          const wCity=real?a.workerCity:(U(a.workerId)?U(a.workerId).city:'—');
+          return `<tr>
+            <td>${esc(wName)}</td><td>${esc(wCity)}</td><td>${fmtT(a.ts)}</td>
+            <td><span class="tag ${a.status}">${a.status==='wait'?'čaká':a.status==='ok'?'prijatý':'zamietnutý'}</span></td>
+            <td style="white-space:nowrap">
+              ${a.status==='wait'?`<button class="btn ok s" onclick="act.decide(${a.id},'ok')">Prijať</button>
+              <button class="btn no s" onclick="act.decide(${a.id},'no')">Zamietnuť</button>`:''}
+              <button class="btn g s" onclick="act.chat('${a.workerId}')">Chat</button>
+            </td></tr>`;}).join('')}
+        </table>`:'<div class="sub" style="margin:1rem 0 0">Zatiaľ žiadni uchádzači.</div>'}
+      </div>`;}).join('')||'<div class="sub">Zatiaľ žiadne ponuky — pridaj prvú.</div>'}
+    </div>`;
+  }
+  return viewChat();
+}
+
+function viewAdmin(){
+  if(me.real&&tab!=='chat'){
+    const s=R.stats||{users:0,workers:0,companies:0,blocked:0,jobs:0,activeJobs:0,apps:0,msgs:0};
+    if(tab==='overview'){
+      return `
+      <h1 class="h-page">Admin</h1>
+      <div class="sub">Stav platformy — skutočné dáta zo Supabase.</div>
+      <div class="grid g3">
+        ${statCard('Používatelia',s.users,s.blocked+' blok.')}
+        ${statCard('Pracovníci',s.workers)}
+        ${statCard('Firmy',s.companies)}
+        ${statCard('Inzeráty',s.jobs,s.activeJobs+' aktívnych')}
+        ${statCard('Prihlášky',s.apps)}
+        ${statCard('Správy',s.msgs)}
+      </div>`;
+    }
+    if(tab==='users'){
+      return `
+      <h1 class="h-page">Používatelia</h1>
+      <div class="sub">Blokovanie vypne prihlásenie, mazanie odstráni aj inzeráty a správy.</div>
+      <div class="panel" style="padding:.4rem 0;overflow-x:auto">
+        <table class="tbl"><tr><th>Meno</th><th>Rola</th><th>Mesto</th><th>Stav</th><th></th></tr>
+        ${R.users.map(u=>`<tr>
+          <td>${esc(u.name)}</td>
+          <td><span class="tag ${u.role}">${u.role==='worker'?'pracovník':u.role==='company'?'firma':'admin'}</span></td>
+          <td>${esc(u.city||'—')}</td>
+          <td><span class="tag ${u.blocked?'off':'act'}">${u.blocked?'blokovaný':'aktívny'}</span></td>
+          <td style="white-space:nowrap">
+            ${u.role!=='admin'?`
+            <button class="btn g s" onclick="act.chat('${u.id}')">Chat</button>
+            <button class="btn g s" onclick="act.block('${u.id}')">${u.blocked?'Odblokovať':'Blokovať'}</button>
+            <button class="btn no s" onclick="act.delUser('${u.id}')">Zmazať</button>`:'<span style="color:var(--mute);font-size:.8rem">to si ty</span>'}
+          </td></tr>`).join('')}
+        </table>
+      </div>`;
+    }
+    if(tab==='jobs'){
+      return `
+      <h1 class="h-page">Inzeráty</h1>
+      <div class="sub">Všetky ponuky na platforme.</div>
+      <div class="panel" style="padding:.4rem 0;overflow-x:auto">
+        <table class="tbl"><tr><th>Ponuka</th><th>Firma</th><th>Kategória</th><th>Mesto</th><th>Stav</th><th></th></tr>
+        ${R.alljobs.map(j=>`<tr>
+          <td>${esc(j.title)}</td><td>${esc(j.companyName)}</td><td>${esc(j.cat)}</td><td>${esc(j.city)}</td>
+          <td><span class="tag ${j.active?'act':'off'}">${j.active?'aktívna':'pozastavená'}</span></td>
+          <td style="white-space:nowrap">
+            <button class="btn g s" onclick="act.toggleJob(${j.id})">${j.active?'Pozastaviť':'Aktivovať'}</button>
+            <button class="btn no s" onclick="act.delJob(${j.id})">Zmazať</button>
+          </td></tr>`).join('')||'<tr><td colspan="6" style="color:var(--mute)">Žiadne inzeráty.</td></tr>'}
+        </table>
+      </div>`;
+    }
+  }
+  if(tab==='overview'){
+    return `
+    <h1 class="h-page">Admin</h1>
+    <div class="sub">Stav platformy v reálnom čase.</div>
+    <div class="grid g3">
+      ${statCard('Používatelia',DB.users.length,DB.users.filter(u=>u.blocked).length+' blok.')}
+      ${statCard('Pracovníci',DB.users.filter(u=>u.role==='worker').length)}
+      ${statCard('Firmy',DB.users.filter(u=>u.role==='company').length)}
+      ${statCard('Ponuky',DB.jobs.length,DB.jobs.filter(j=>j.active).length+' aktívnych')}
+      ${statCard('Prihlášky',DB.apps.length,DB.apps.filter(a=>a.status==='wait').length+' čaká')}
+      ${statCard('Správy',DB.msgs.length)}
+    </div>`;
+  }
+  if(tab==='users'){
+    return `
+    <h1 class="h-page">Používatelia</h1>
+    <div class="sub">Blokovanie vypne prihlásenie, mazanie odstráni aj ponuky a správy.</div>
+    <div class="panel" style="padding:.4rem 0;overflow-x:auto">
+      <table class="tbl"><tr><th>Meno</th><th>E-mail</th><th>Rola</th><th>Mesto</th><th>Stav</th><th></th></tr>
+      ${DB.users.map(u=>`<tr>
+        <td>${esc(u.name)}</td><td style="font-family:var(--mono);font-size:.82rem">${esc(u.email)}</td>
+        <td><span class="tag ${u.role}">${u.role==='worker'?'pracovník':u.role==='company'?'firma':'admin'}</span></td>
+        <td>${esc(u.city)}</td>
+        <td><span class="tag ${u.blocked?'off':'act'}">${u.blocked?'blokovaný':'aktívny'}</span></td>
+        <td style="white-space:nowrap">
+          ${u.role!=='admin'?`
+          <button class="btn g s" onclick="act.chat(${u.id})">Chat</button>
+          <button class="btn g s" onclick="act.block(${u.id})">${u.blocked?'Odblokovať':'Blokovať'}</button>
+          <button class="btn no s" onclick="act.delUser(${u.id})">Zmazať</button>`:''}
+        </td></tr>`).join('')}
+      </table>
+    </div>`;
+  }
+  if(tab==='jobs'){
+    return `
+    <h1 class="h-page">Ponuky</h1>
+    <div class="sub">Všetky inzeráty na platforme.</div>
+    <div class="panel" style="padding:.4rem 0;overflow-x:auto">
+      <table class="tbl"><tr><th>Ponuka</th><th>Firma</th><th>Kategória</th><th>Mesto</th><th>Uchádzači</th><th>Stav</th><th></th></tr>
+      ${DB.jobs.map(j=>{
+        const co=U(j.companyId);
+        return `<tr>
+          <td>${esc(j.title)}</td><td>${esc(co?co.name:'—')}</td><td>${esc(j.cat)}</td><td>${esc(j.city)}</td>
+          <td>${DB.apps.filter(a=>a.jobId===j.id).length}</td>
+          <td><span class="tag ${j.active?'act':'off'}">${j.active?'aktívna':'pozastavená'}</span></td>
+          <td style="white-space:nowrap">
+            <button class="btn g s" onclick="act.toggleJob(${j.id})">${j.active?'Pozastaviť':'Aktivovať'}</button>
+            <button class="btn no s" onclick="act.delJob(${j.id})">Zmazať</button>
+          </td></tr>`;}).join('')}
+      </table>
+    </div>`;
+  }
+  return viewChat();
+}
+
+function viewModal(){
+  if(!modal)return'';
+  const j=modal.job;
+  return `<div class="modal-bg" onclick="if(event.target===this)act.closeModal()">
+    <div class="modal">
+      <h3>${j?'Upraviť ponuku':'Nová ponuka'}</h3>
+      <form onsubmit="act.saveJob(event)">
+        <label>Názov</label><input id="j-title" value="${j?esc(j.title):''}" placeholder="Barista — víkendy">
+        <label>Kategória</label>
+        <select id="j-cat">${CATS.map(c=>`<option ${j&&j.cat===c?'selected':''}>${c}</option>`).join('')}</select>
+        <label>Mesto</label>
+        <select id="j-city">${CITIES.map(c=>`<option ${j&&j.city===c?'selected':''}>${c}</option>`).join('')}</select>
+        <label>Typ</label>
+        <select id="j-type">${['brigáda','stáž','part-time'].map(t=>`<option ${j&&j.type===t?'selected':''}>${t}</option>`).join('')}</select>
+        <label>Hodinovka</label><input id="j-pay" value="${j?esc(j.pay):''}" placeholder="6,50 € / h">
+        <label>Kedy sa pracuje</label><input id="j-when" value="${j&&j.when?esc(j.when):''}" placeholder="Po–Pia 16–20 h">
+        <label>Nástup</label><input id="j-start" value="${j&&j.start?esc(j.start):''}" placeholder="ihneď">
+        <label>Voľné miesta</label><input id="j-spots" type="number" min="1" value="${j&&j.spots?j.spots:1}">
+        <label>Popis</label><textarea id="j-desc" placeholder="Čo sa robí, kedy a čo za to…">${j?esc(j.desc):''}</textarea>
+        <label>Čo bude robiť (1 riadok = 1 položka, nepovinné)</label><textarea id="j-tasks">${j&&j.tasks?esc(j.tasks):''}</textarea>
+        <label>Čo potrebuje (nepovinné)</label><textarea id="j-req">${j&&j.reqs?esc(j.reqs):''}</textarea>
+        <label>Benefity (nepovinné)</label><textarea id="j-perks">${j&&j.perks?esc(j.perks):''}</textarea>
+        <div style="margin-top:1.3rem;display:flex;gap:.7rem">
+          <button class="btn p" type="submit">${j?'Uložiť':'Zverejniť'} →</button>
+          <button class="btn g" type="button" onclick="act.closeModal()">Zrušiť</button>
+        </div>
+      </form>
+    </div>
+  </div>`;
+}
+
+/* ================= SHELL ================= */
+const TABS={
+  worker:[['overview','Prehľad'],['jobs','Ponuky'],['apps','Prihlášky'],['chat','Správy']],
+  company:[['overview','Prehľad'],['jobs','Moje ponuky'],['chat','Správy']],
+  admin:[['overview','Prehľad'],['users','Používatelia'],['jobs','Ponuky'],['chat','Správy']]
+};
+function render(){
+  const app=$('#app');
+  if(!me){app.innerHTML=viewAuth();return;}
+  const tabs=TABS[me.role];
+  const mc=msgCount();
+  app.innerHTML=`
+    ${me.real
+  ?''
+  :'<div class="banner">Demo režim — dáta sa po obnovení stránky resetujú.</div>'}
+    <div class="top">
+      <a class="logo" href="index.html">jobsy<b>.</b>sk</a>
+      <nav>${tabs.map(([k,l])=>`<button class="tab ${tab===k?'on':''}" onclick="act.tab('${k}')">${l}${k==='chat'&&mc?`<span class="bdg">${mc}</span>`:''}</button>`).join('')}</nav>
+      <div class="uchip">
+        <span>${esc(me.name)}</span>
+        <span class="role">${me.role==='worker'?'pracovník':me.role==='company'?'firma':'admin'}</span>
+        <button onclick="act.logout()">odhlásiť</button>
+      </div>
+    </div>
+    <div class="page">
+      ${me.role==='worker'?viewWorker():me.role==='company'?viewCompany():viewAdmin()}
+    </div>
+    ${viewModal()}`;
+  const m=$('#msgs');if(m)m.scrollTop=m.scrollHeight;
+  const ci=$('#c-inp');if(ci&&tab==='chat')ci.focus();
+}
+window.DB=DB;
+
+async function loadRealProfile(user){
+  let prof=null;
+  try{
+    const {data}=await sb.from('profiles').select('*').eq('id',user.id).single();
+    prof=data;
+  }catch(e){}
+  me={id:user.id,real:true,email:user.email,
+      role:(prof&&prof.role)||'worker',
+      name:(prof&&prof.name)||user.email.split('@')[0],
+      city:(prof&&prof.city)||'—',blocked:!!(prof&&prof.blocked)};
+  err='';tab='overview';
+  await loadRealData();
+  await loadRealChat();
+  if(me.role==='admin')await loadAdminData();
+  subscribeChat();
+  render();
+}
+
+render();
+if(sb){
+  sb.auth.getSession().then(({data})=>{
+    if(data.session)loadRealProfile(data.session.user);
+  });
+}
+})();
+</script>
+<script>
+(function(){
+'use strict';
+const REDUCED=matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+/* prechod stránky: vstup aj odchod */
+const wipe=document.getElementById('wipe');
+requestAnimationFrame(()=>requestAnimationFrame(()=>wipe.classList.add('off')));
+document.addEventListener('click',e=>{
+  const a=e.target.closest('a');if(!a)return;
+  const href=a.getAttribute('href')||'';
+  if(!/^(index|ponuky|podmienky|sukromie)\.html/.test(href))return;
+  if(e.ctrlKey||e.metaKey||a.target==='_blank')return;
+  e.preventDefault();
+  if(REDUCED){location.href=href;return;}
+  wipe.classList.remove('off');wipe.classList.add('out');
+  setTimeout(()=>{location.href=href;},480);
+});
+addEventListener('pageshow',e=>{if(e.persisted){wipe.classList.add('off');wipe.classList.remove('out');}});
+
+/* ambientné bodky + aura za kurzorom — rovnaké ako na webe, len jemnejšie */
+if(!REDUCED){
+  const cv=document.getElementById('dots'),ctx=cv.getContext('2d');
+  const N=innerWidth<700?50:110;
+  let W,H;
+  function size(){
+    W=cv.width=innerWidth*devicePixelRatio;
+    H=cv.height=innerHeight*devicePixelRatio;
+    cv.style.width=innerWidth+'px';cv.style.height=innerHeight+'px';
+  }
+  size();addEventListener('resize',size);
+  const dots=Array.from({length:N},()=>({x:Math.random(),y:Math.random(),
+    vx:(Math.random()-.5)*.0004,vy:(Math.random()-.5)*.0004,
+    r:.6+Math.random()*1.4,s:Math.random()*6.28}));
+  let mx=-1e4,my=-1e4,sx=innerWidth/2,sy=innerHeight/2;
+  addEventListener('pointermove',e=>{mx=e.clientX;my=e.clientY;});
+  function frame(t){
+    requestAnimationFrame(frame);
+    if(document.hidden)return;
+    ctx.clearRect(0,0,W,H);
+    const dpr=devicePixelRatio;
+    sx+=(((mx>-9000)?mx:innerWidth/2)-sx)*.055;
+    sy+=(((my>-9000)?my:innerHeight/2)-sy)*.055;
+    if(mx>-9000){
+      const g=ctx.createRadialGradient(sx*dpr,sy*dpr,0,sx*dpr,sy*dpr,220*dpr);
+      g.addColorStop(0,'rgba(124,92,255,.07)');
+      g.addColorStop(.55,'rgba(61,232,255,.025)');
+      g.addColorStop(1,'rgba(0,0,0,0)');
+      ctx.fillStyle=g;ctx.fillRect(0,0,W,H);
+    }
+    for(const d of dots){
+      d.x+=d.vx;d.y+=d.vy;
+      if(d.x<0||d.x>1)d.vx*=-1;
+      if(d.y<0||d.y>1)d.vy*=-1;
+      const par=(d.r-.6)/1.4;
+      const px=d.x*innerWidth+(sx-innerWidth/2)*.025*par,
+            py=d.y*innerHeight+(sy-innerHeight/2)*.025*par;
+      const dist=Math.hypot(px-mx,py-my);
+      const glow=Math.max(0,1-dist/180);
+      const tw=.18+.12*Math.sin(t*.001+d.s);
+      ctx.beginPath();
+      ctx.arc(px*dpr,py*dpr,(d.r+glow*1.6)*dpr,0,6.283);
+      ctx.fillStyle=glow>0
+        ?`rgba(124,92,255,${(tw+glow*.5).toFixed(3)})`
+        :`rgba(238,240,255,${(tw*.4).toFixed(3)})`;
+      ctx.fill();
+    }
+  }
+  requestAnimationFrame(frame);
+}
+})();
+</script>
+</body>
+</html>
