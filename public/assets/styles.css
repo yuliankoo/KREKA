@@ -1030,3 +1030,27 @@ body:has(.sheet.on) .mbar,body:has(.palette.on) .mbar{transform:translate(-50%,1
 @media (max-width:900px){.nav .actions>.btn{display:none}.nav .actions{padding-left:0;gap:6px}.nav .actions::before{display:none}}
 
 .hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* ===== v17: na telefónoch je tunel posuvný carousel ===== */
+.depth.carousel{height:auto;margin-top:-100vh;z-index:1}
+.carousel .depth-stage{position:relative;height:auto;min-height:100svh;display:flex;flex-direction:column;justify-content:center;overflow:visible;perspective:none;padding:clamp(80px,12vw,120px) 0 40px;contain:none;will-change:opacity}
+.carousel .depth-head{position:relative;left:auto;top:auto;right:auto;max-width:none;padding:0 var(--pad);margin-bottom:20px}
+.carousel .depth-head p{display:block;max-width:34ch}
+.carousel .world{position:relative;inset:auto;transform:none!important;transform-style:flat;display:flex;gap:14px;overflow-x:auto;overscroll-behavior-x:contain;scroll-snap-type:x mandatory;padding:4px var(--pad) 16px;scrollbar-width:none;-webkit-overflow-scrolling:touch}
+.carousel .world::-webkit-scrollbar{display:none}
+.carousel .pane{position:relative;left:auto;top:auto;flex:0 0 86%;max-width:430px;width:auto;margin:0;transform:none!important;filter:none!important;opacity:1!important;visibility:visible!important;pointer-events:auto!important;scroll-snap-align:center;background:var(--glass-strong);-webkit-backdrop-filter:none;backdrop-filter:none}
+.carousel .pane p{display:block}
+.carousel .fscale{display:none!important}
+.carousel .fdots{position:relative;left:auto;bottom:auto;transform:none;display:flex;justify-content:center;gap:8px;margin-top:2px}
+.fdots button{width:18px;height:6px;padding:0;border:0;border-radius:3px;background:var(--line);cursor:pointer;transition:width .35s cubic-bezier(.2,.8,.2,1),background .35s}
+.fdots button.on{width:34px;background:var(--kreka-blue)}
+.carousel .depth-head h2{font-size:clamp(1.7rem,6vw,2.3rem)}
+/* menej vrstiev, ktoré musí mobil prekresľovať */
+.lowfx .atmos i{transform:none!important;will-change:auto}
+.lowfx .hero-stage{contain:none}
+.lowfx .mbar{-webkit-backdrop-filter:none;backdrop-filter:none;background:color-mix(in srgb,var(--bg) 92%,#fff)}
+:root[data-theme="dark"].lowfx .mbar{background:color-mix(in srgb,var(--bg) 82%,#4EA0DC)}
+/* mobil: namiesto troch veľkých rozmazaných vrstiev jednoduché pozadie (iOS ich prekresľuje pri každom scrolle) */
+.lowfx .atmos{display:none}
+.lowfx body{background:linear-gradient(180deg,#F5F5F5 0%,#E7F1FA 22%,#F5F5F5 48%,#E9F2FA 74%,#F5F5F5 100%)}
+:root[data-theme="dark"].lowfx body{background:linear-gradient(180deg,#0B131B 0%,#122334 24%,#0B131B 52%,#112231 78%,#0B131B 100%)}
