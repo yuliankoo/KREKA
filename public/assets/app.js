@@ -804,7 +804,8 @@ function initHome(){
   };
   const panes=$$('.pane'),world=$('#world'),fscale=$('#fscale'),dot=fscale.querySelector('.dot'),fdots=$('#fdots');
   const N=panes.length,GAP=950;
-  const CAROUSEL=!RM&&matchMedia('(max-width:760px)').matches;
+  /* 3D tunel beží rovnako na počítači aj na telefóne */
+  const CAROUSEL=false;
   const btns=panes.map((p,i)=>{const b=document.createElement('button');b.type='button';b.textContent=p.dataset.label;b.addEventListener('click',()=>{const t=depthEl.offsetHeight-innerHeight;scrollTo({top:depthEl.offsetTop+t*((i+1-.45)/(N-.45)),behavior:RM?'auto':'smooth'})});fscale.appendChild(b);return b});
   const dots=panes.map(()=>{const i=document.createElement('i');fdots.appendChild(i);return i});
   const bokeh=[];
@@ -825,7 +826,7 @@ function initHome(){
     const p=Math.abs(dp-target)<.0003?target:dp,u=.45+p*(N-.45),base=Math.floor(u),cam=GAP*(Math.min(base,N)+(base<N?inOut(u-base):0));
     const narrow=innerWidth<760,xo=narrow?0:Math.min(innerWidth*.12,190);
     world.style.transform='translateZ('+cam.toFixed(1)+'px)';
-    panes.forEach((el,i)=>{const z=(i+1)*GAP,d=cam-z,ad=Math.abs(d),blur=d<0?Math.min(ad/110,14):Math.min(d/35,14),op=d>0?clamp(1-d/(LOWFX?300:420),0,1):(LOWFX?clamp(1-(ad-160)/(GAP*.75),0,1):clamp(1-(ad-280)/(GAP*1.7),0,1)),x=(i%2?1:-1)*xo,y=narrow?0:(i%2?-18:18),f=clamp(1-ad/300,0,1);
+    panes.forEach((el,i)=>{const z=(i+1)*GAP,d=cam-z,ad=Math.abs(d),blur=d<0?Math.min(ad/110,14):Math.min(d/35,14),op=d>0?clamp(1-d/(LOWFX?240:420),0,1):(LOWFX?clamp(1-(ad-70)/(GAP*.52),0,1):clamp(1-(ad-280)/(GAP*1.7),0,1)),x=(i%2?1:-1)*xo,y=narrow?0:(i%2?-18:18),f=clamp(1-ad/300,0,1);
       el.style.transform='translate3d(calc(-50% + '+x+'px),calc(-50% + '+y+'px),'+(-z)+'px) rotateX('+(tilt.y*.3*f).toFixed(2)+'deg) rotateY('+(tilt.x*.3+(i%2?-4:4)*(1-f)).toFixed(2)+'deg)';
       el.style.filter=(LOWFX||blur<.35)?'none':'blur('+blur.toFixed(1)+'px)';el.style.opacity=op.toFixed(3);el.style.visibility=op<.01?'hidden':'visible';el.style.pointerEvents=ad<220?'auto':'none'});
     bokeh.forEach(b=>{const d=cam-b._z,o=d>0?clamp(1-d/240,0,1):clamp(1+d/(GAP*2.6),0,1);b.style.opacity=(o*b._m).toFixed(3)});
