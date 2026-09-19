@@ -1054,3 +1054,23 @@ body:has(.sheet.on) .mbar,body:has(.palette.on) .mbar{transform:translate(-50%,1
 .lowfx .atmos{display:none}
 .lowfx body{background:linear-gradient(180deg,#F5F5F5 0%,#E7F1FA 22%,#F5F5F5 48%,#E9F2FA 74%,#F5F5F5 100%)}
 :root[data-theme="dark"].lowfx body{background:linear-gradient(180deg,#0B131B 0%,#122334 24%,#0B131B 52%,#112231 78%,#0B131B 100%)}
+
+/* ===== v18: realizované projekty na úvode ===== */
+.ref-sum{display:flex;flex-wrap:wrap;gap:8px;margin-top:26px}
+.ref-sum .tag b{font-weight:600;color:var(--ink)}
+.ref-grid{list-style:none;margin:26px 0 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(250px,1fr));gap:14px}
+.ref-card{padding:22px;border-radius:24px;display:flex;flex-direction:column;gap:14px;transition:transform .4s cubic-bezier(.2,.8,.2,1),box-shadow .4s}
+.ref-card .ico{width:42px;height:42px;border-radius:13px;display:grid;place-items:center;background:var(--kreka-blue);color:var(--kreka-light)}
+.ref-card .ico svg{width:21px;height:21px}
+.ref-card b{font-weight:500;font-size:1.06rem;letter-spacing:-.01em;line-height:1.25}
+.ref-card .rtags{display:flex;flex-wrap:wrap;gap:6px;margin-top:auto}
+.ref-card .rtags span{font-size:.78rem;padding:4px 10px;border-radius:999px;background:rgba(78,160,220,.14);color:var(--ink-2)}
+@media (hover:hover){.ref-card:hover{transform:translateY(-4px);box-shadow:0 24px 40px -28px var(--shadow)}}
+.ref-more{display:grid;grid-template-rows:0fr;transition:grid-template-rows .55s cubic-bezier(.2,.8,.2,1)}
+.ref-more.on{grid-template-rows:1fr}
+.ref-more-in{overflow:hidden;min-height:0}
+.ref-more .filters{margin-top:26px}
+.ref-more.on .ref-more-in{padding-bottom:4px}
+#realizacie .page-meta{margin-top:22px}
+@media (prefers-reduced-motion:reduce){.ref-more{transition:none}}
+@media (max-width:520px){.ref-grid{grid-template-columns:1fr}.ref-sum{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none;margin-left:calc(var(--pad)*-1);margin-right:calc(var(--pad)*-1);padding:0 var(--pad) 4px}.ref-sum::-webkit-scrollbar{display:none}.ref-sum .tag{flex:none}}

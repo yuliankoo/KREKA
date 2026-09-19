@@ -509,11 +509,24 @@ function segPanel(s){
   h+='<div class="page-meta"><a class="btn btn-primary" href="'+orderHref('',('Riešenie na kľúč: '+s.name))+'">Chcem riešenie na mieru</a><a class="btn btn-ghost" href="'+H('sluzby/financne-sluzby')+'">Financovanie leasingom</a></div>';
   return h;
 }
+const REF_TAG_ICON={'Kamerový systém':'camera','Zabezpečovací systém':'shield','Štruktúrovaná kabeláž':'cable','Pokladničný systém':'register','IT technika':'laptop','Správa IT':'laptop','Správa siete':'cable','Serverové riešenie':'laptop','Dochádzkový systém':'clock','Spotrebný materiál':'box','Servis':'wrench','Nočné osvetlenie objektu':'sun'};
+const REF_FEATURED=['Mesto Brezno','Lesy Mesta Brezno','KP Gastro Donovaly','Fotovoltaická elektráreň Rohozná','Haggi Group','IN Elis SK a CZ','ŽP BYTOS, s.r.o.','Úrad práce, sociálnych vecí a rodiny Brezno'];
+function refTags(){const t={};REFS.forEach(([,x])=>x.forEach(v=>t[v]=(t[v]||0)+1));return Object.entries(t).sort((x,y)=>y[1]-x[1])}
+function refCards(names){
+  return '<ul class="ref-grid">'+names.map(n=>{
+    const r=REFS.find(x=>x[0]===n)||[n,[]];
+    return '<li class="ref-card glass">'+ic(REF_TAG_ICON[r[1][0]]||'box')+'<b>'+r[0]+'</b><span class="rtags">'+r[1].map(t=>'<span>'+t+'</span>').join('')+'</span></li>';
+  }).join('')+'</ul>';
+}
+function refsBlock(){
+  const top=refTags().filter(([,n])=>n>1);
+  return '<div class="filters" role="group" aria-label="Filtrovať podľa typu"><button type="button" class="on" data-f="">Všetky <b>'+REFS.length+'</b></button>'
+    +top.map(([t,n])=>'<button type="button" data-f="'+t+'">'+t+' <b>'+n+'</b></button>').join('')+'</div>'
+    +'<ul class="refs glass">'+REFS.map(([n,t])=>'<li data-t="'+t.join('|')+'"><b>'+n+'</b><span class="rtags">'+t.map(x=>'<span>'+x+'</span>').join('')+'</span></li>').join('')+'</ul>';
+}
 function pageReferences(){
-  const tags={};REFS.forEach(([,t])=>t.forEach(x=>tags[x]=(tags[x]||0)+1));
-  const top=Object.entries(tags).filter(([,n])=>n>1).sort((a,b)=>b[1]-a[1]);
   let out=pageHero('Realizované projekty a referencie','Kde možno získať referencie na nami poskytované služby a dodávky kamerových a zabezpečovacích systémov, IT techniky, štruktúrovanej kabeláže a dochádzkových systémov.',[['O nás','o-nas'],['Realizované projekty']],'<div class="page-meta"><span class="tag"><i></i>'+REFS.length+' uvedených zákazníkov</span><span class="tag">a mnoho iných spokojných zákazníkov</span></div>');
-  out+='<div class="page-body"><div class="wrap"><div class="filters" role="group" aria-label="Filtrovať podľa typu"><button type="button" class="on" data-f="">Všetky <b>'+REFS.length+'</b></button>'+top.map(([t,n])=>'<button type="button" data-f="'+t+'">'+t+' <b>'+n+'</b></button>').join('')+'</div><ul class="refs glass" id="refs">'+REFS.map(([n,t])=>'<li data-t="'+t.join('|')+'"><b>'+n+'</b><span class="rtags">'+t.map(x=>'<span>'+x+'</span>').join('')+'</span></li>').join('')+'</ul></div></div>';
+  out+='<div class="page-body"><div class="wrap">'+refsBlock()+'</div></div>';
   return {title:'Realizované projekty',html:out,after:initRefs};
 }
 function pageCerts(){
@@ -590,7 +603,12 @@ function pageHome(){
   const quick=['servis-na-dialku','hotline-podpora','servis-erp-pokladni-a-prislusenstva','servis-bezpecnostnych-a-signalizacnych-systemov','servis-vypoctovej-techniky','projekcia-systemov','prehliadky-priestorov-proti-odpocuvaniu','prenajom-plosiny-a-vyskove-prace','prenajom-zariadeni','autodoprava','financne-sluzby'].map(S);
   h+='<section class="section" style="padding-top:0"><div class="wrap svc"><div class="svc-side"><h2 class="h2">Služby</h2><p class="lead">Záručný aj pozáručný servis v Brezne a po celom Slovensku. Plošinu s dosahom 9,6 m aj dodávku si môžete prenajať.</p><a class="btn btn-primary" href="'+H('objednat-servis')+'">Objednať servis alebo službu</a></div><ul class="svc-list glass">'+quick.map(s=>'<li><a class="svc-row" href="'+svcHref(s)+'"><div><b>'+s.title+'</b><span>'+s.short+'</span></div><em>Otvoriť</em></a></li>').join('')+'</ul></div></section>';
   h+='<section class="section" style="padding-top:0"><div class="wrap"><h2 class="h2">Riešenia na kľúč</h2><p class="lead">Pre koho techniku hľadáte?</p><div class="chips">'+SEGMENTS.map(s=>'<a class="chip" style="display:inline-flex;align-items:center;text-decoration:none" href="'+H('riesenia?s='+s.id)+'">'+s.name+'</a>').join('')+'</div></div></section>';
-  h+='<section class="section" style="padding-top:0"><div class="wrap"><h2 class="h2">Realizované projekty</h2><p class="lead">Obce, mestá, firmy, reštaurácie aj fotovoltaické elektrárne.</p></div><div class="ref-marquee" style="margin-top:36px"><div class="track"><ul>'+REFS.map(r=>'<li>'+r[0]+'</li>').join('')+'</ul><ul class="dup" aria-hidden="true">'+REFS.map(r=>'<li>'+r[0]+'</li>').join('')+'</ul></div></div><div class="wrap"><div class="page-meta"><a class="btn btn-ghost" href="'+H('referencie')+'">Všetky referencie</a><a class="btn btn-ghost" href="'+H('partneri')+'">Partneri</a></div><div class="quotes">'+QUOTES.map(([q,a])=>'<figure class="quote glass"><blockquote>„'+q+'“</blockquote><figcaption>'+a+'</figcaption></figure>').join('')+'</div></div></section>';
+  h+='<section class="section" style="padding-top:0" id="realizacie"><div class="wrap"><h2 class="h2">Realizované projekty</h2><p class="lead">Obce, mestá, firmy, reštaurácie aj fotovoltaické elektrárne. Pozrite si, čo sme kde postavili.</p>'
+    +'<div class="ref-sum">'+refTags().slice(0,6).map(([t,n])=>'<span class="tag"><i></i>'+t+' <b>'+n+'</b></span>').join('')+'</div>'
+    +refCards(REF_FEATURED)
+    +'<div class="ref-more"><div id="refMore" class="ref-more-in">'+refsBlock()+'</div></div>'
+    +'<div class="page-meta"><button class="btn btn-primary" type="button" data-ref-toggle aria-expanded="false" aria-controls="refMore">Zobraziť všetkých '+REFS.length+' zákazníkov</button><a class="btn btn-ghost" href="'+H('referencie')+'">Otvoriť stránku referencií</a><a class="btn btn-ghost" href="'+H('partneri')+'">Partneri</a></div>'
+    +'<div class="quotes">'+QUOTES.map(([q,a])=>'<figure class="quote glass"><blockquote>„'+q+'“</blockquote><figcaption>'+a+'</figcaption></figure>').join('')+'</div></div></section>';
   h+='<section class="section" style="padding-top:0"><div class="wrap"><h2 class="h2">Pozrite si ponuku našich eShopov</h2><div class="shops">'+ESHOPS.slice(0,2).map((e,i)=>'<article class="shop glass"><h3>'+e.name+'</h3><p>'+e.desc+'</p>'+list(e.items,'')+'<a class="btn '+(i?'btn-ghost':'btn-primary')+'" href="'+e.url+'" target="_blank" rel="noopener">Otvoriť '+e.name+'</a></article>').join('')+'</div></div></section>';
   h+='<section class="section" style="padding-top:0"><div class="wrap contact"><div class="card glass">'+hoursBlock()+'<div class="reach"><a href="'+CO.mobileHref+'">'+CO.mobile+' <span>mobil</span></a><a href="'+CO.landlineHref+'">'+CO.landline+' <span>pevná linka</span></a><a href="mailto:'+CO.email+'">'+CO.email+' <span>e-mail</span></a></div></div><div class="card glass home-cta"><h3 style="margin-top:0;font-size:clamp(1.6rem,3vw,2.4rem)">Zaujala vás naša ponuka?</h3><p class="addr" style="max-width:40ch">Napíšte nám, čo potrebujete. Pripravíme e-mail s objednávkou servisu alebo dopytom.</p><div class="map-frame cta-map" data-map><div class="map-fallback"><div class="map-art" role="img" aria-label="Poloha predajne v Brezne"><span>Šrámkova 2A, Brezno</span></div></div><iframe title="Satelitná mapa: KREKA SK s.r.o., Šrámkova 2A, Brezno" data-src="https://maps.google.com/maps?q=48.8038593,19.6425118&t=k&z=18&hl=sk&ie=UTF8&iwloc=&output=embed" loading="lazy" referrerpolicy="no-referrer-when-downgrade" allowfullscreen hidden></iframe><span class="map-pin" aria-hidden="true"><svg viewBox="2.8 3.8 35.7 53.1"><path d="M35.46 56.42 C35.08 56.39 34.65 56.30 34.46 56.21 C34.19 56.08 20.29 42.28 17.75 39.61 C17.49 39.34 16.57 38.43 15.70 37.57 C12.39 34.32 4.41 26.24 4.25 25.98 C3.80 25.25 4.06 24.77 5.85 23.07 C6.60 22.36 7.86 21.13 8.67 20.33 C11.91 17.13 14.83 14.25 17.08 12.07 C18.39 10.80 19.53 9.68 19.62 9.59 C19.72 9.50 20.62 8.61 21.62 7.61 C22.63 6.61 23.88 5.38 24.39 4.86 C25.94 3.29 26.59 3.13 26.58 4.31 C26.58 4.97 26.19 7.14 26.01 7.52 C25.83 7.90 22.06 11.64 13.79 19.66 C12.78 20.64 11.60 21.80 11.17 22.24 C10.73 22.68 10.06 23.34 9.68 23.69 C8.45 24.84 8.40 25.27 9.36 26.27 C10.30 27.26 10.49 27.25 11.65 26.13 C15.22 22.68 16.85 21.13 17.11 20.93 C17.27 20.80 17.79 20.31 18.27 19.83 C19.37 18.72 20.90 17.24 22.75 15.50 C23.54 14.74 24.50 13.82 24.87 13.46 C25.85 12.48 26.46 12.26 26.68 12.81 C26.87 13.30 26.49 15.89 26.12 16.65 C25.89 17.12 22.71 20.35 15.86 27.07 C12.92 29.96 12.89 30.02 13.84 31.15 C14.41 31.84 14.74 31.99 15.18 31.81 C15.36 31.73 17.31 29.84 20.39 26.76 C25.26 21.90 25.60 21.58 25.92 21.75 C26.29 21.95 26.32 22.26 26.12 23.94 C25.93 25.51 26.02 25.37 23.15 28.22 C20.30 31.05 19.92 31.44 19.92 31.51 C19.92 31.54 19.62 31.81 19.26 32.11 C18.22 32.97 17.42 34.01 17.42 34.51 C17.42 34.80 17.74 35.14 23.71 41.08 C25.31 42.68 26.69 44.05 26.78 44.14 C28.78 46.20 37.30 54.70 37.53 54.87 C38.02 55.24 38.21 55.77 38.00 56.16 C37.83 56.49 37.14 56.56 35.46 56.42 Z M26.75 56.17 C26.22 56.14 25.70 56.07 25.58 56.01 C25.41 55.92 15.19 45.71 13.37 43.81 C13.10 43.53 12.67 43.10 12.42 42.88 C11.62 42.15 4.69 35.10 4.26 34.58 C3.45 33.61 3.40 33.48 3.31 32.03 C3.22 30.59 3.25 30.39 3.54 30.20 C3.96 29.93 4.18 30.10 6.74 32.66 C8.05 33.98 10.52 36.46 12.23 38.17 C13.94 39.89 15.42 41.37 15.51 41.46 C20.10 45.98 29.33 55.38 29.33 55.53 C29.33 55.82 29.11 56.07 28.77 56.16 C28.44 56.25 28.28 56.25 26.75 56.17 Z M18.42 56.09 C16.99 56.02 17.17 56.13 14.92 53.92 C9.43 48.51 4.06 43.10 3.83 42.77 C3.52 42.30 3.44 42.01 3.34 40.99 C3.10 38.78 3.39 38.30 4.47 39.12 C4.87 39.43 8.41 42.92 11.29 45.86 C11.66 46.23 12.14 46.71 12.36 46.91 C12.58 47.12 14.33 48.85 16.25 50.75 C18.17 52.65 19.99 54.44 20.30 54.72 C20.79 55.17 20.84 55.25 20.82 55.50 C20.76 56.08 20.34 56.19 18.42 56.09 Z"/></svg><span><b>KREKA SK s.r.o.</b>Šrámkova 2A, Brezno</span></span><button class="map-shield" type="button" aria-label="Aktivovať ovládanie mapy"><span>Kliknite pre ovládanie mapy</span></button></div><div class="page-meta"><a class="btn btn-primary" href="'+H('objednat-servis')+'">Napísať nám</a><a class="btn btn-ghost" href="'+CO.maps+'" target="_blank" rel="noopener">Navigovať</a></div></div></div></section>';
   return {title:'',html:h,after:initHome};
@@ -942,33 +960,13 @@ function initSegments(){
     if(innerWidth<900)panel.scrollIntoView({behavior:RM?'auto':'smooth',block:'start'});
   }));
 }
-function initRefs(){
-  const items=$$('#refs li');
-  $$('.filters button').forEach(b=>b.addEventListener('click',()=>{
-    const f=b.dataset.f;$$('.filters button').forEach(x=>x.classList.toggle('on',x===b));
+function initRefs(scope){
+  const root=scope&&scope.querySelector?scope:document;
+  const items=$$('.refs li',root);
+  $$('.filters button',root).forEach(b=>b.addEventListener('click',()=>{
+    const f=b.dataset.f;$$('.filters button',root).forEach(x=>x.classList.toggle('on',x===b));
     items.forEach(li=>{li.hidden=!!f&&!li.dataset.t.split('|').includes(f)});
   }));
-}
-/* ================= LEAD / OBJEDNÁVKA ================= */
-/* Ak je nastavený Supabase (assets/config.js), dopyt sa uloží do databázy.
-   Bez konfigurácie alebo pri chybe sa pripraví e-mail ako predtým. */
-const CFG=()=>window.KREKA_CONFIG||{};
-async function sendLead(payload){
-  const c=CFG();
-  if(!c.supabaseUrl||!c.supabaseAnonKey)return 'mail';
-  const r=await fetch(c.supabaseUrl.replace(/\/+$/,'')+'/rest/v1/'+(c.leadsTable||'dopyty'),{
-    method:'POST',
-    headers:{'Content-Type':'application/json',apikey:c.supabaseAnonKey,Authorization:'Bearer '+c.supabaseAnonKey,Prefer:'return=minimal'},
-    body:JSON.stringify(payload)
-  });
-  if(!r.ok)throw new Error('Supabase '+r.status+' '+(await r.text()).slice(0,140));
-  return 'db';
-}
-function mailFallback(d){
-  const body=['Názov firmy / Meno a priezvisko: '+d.firma,'Kontaktná osoba: '+d.osoba,'Telefón: '+d.telefon,'E-mail: '+d.email,'Mesto/Obec: '+d.mesto,'Typ servisu: '+d.typ,'Priorita servisu: '+d.priorita,'Kategória: '+d.kategoria,'','Popis problému:',d.popis].join('\n');
-  const a=document.createElement('a');
-  a.href='mailto:'+CO.email+'?subject='+encodeURIComponent('Objednávka servisu: '+d.kategoria+' ('+d.priorita+' priorita)')+'&body='+encodeURIComponent(body);
-  a.target='_blank';a.rel='noopener';document.body.appendChild(a);a.click();a.remove();
 }
 function initOrder(){
   const form=$('#orderForm'),msg=$('#orderMsg'),btn=form.querySelector('button[type=submit]'),t0=Date.now();
@@ -1159,6 +1157,16 @@ buildIndex();buildNav();buildFooter();paintTheme();
 addEventListener('hashchange',render);
 render().then(()=>{intro();requestAnimationFrame(frame)});
 
+
+/* ================= ROZBALENIE REFERENCIÍ NA ÚVODE ================= */
+document.addEventListener('click',e=>{
+  const btn=e.target.closest('[data-ref-toggle]');if(!btn)return;
+  const box=btn.closest('.wrap').querySelector('.ref-more'),on=!box.classList.contains('on');
+  box.classList.toggle('on',on);btn.setAttribute('aria-expanded',on);
+  btn.textContent=on?'Skryť zoznam':'Zobraziť všetkých '+REFS.length+' zákazníkov';
+  if(on&&!box.dataset.ready){box.dataset.ready='1';initRefs(box)}
+  if(!on)box.scrollIntoView({block:'nearest',behavior:RM?'auto':'smooth'});
+});
 
 /* ================= SATELLITE MAP ================= */
 /* Loads Google satellite embed when the map scrolls near. If the host blocks frames (strict CSP), the styled fallback with a link stays. */
